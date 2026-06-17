@@ -1,9 +1,7 @@
-// Ativa um modo mais rigoroso do JavaScript.
-// Isso ajuda a evitar alguns erros comuns durante o desenvolvimento.
 "use strict";
 
-// Cria uma chave fixa para salvar e buscar os dados no localStorage.
-// Essa chave funciona como o "nome da gaveta" onde os registros serão guardados.
+// Chave fixa usada para salvar e buscar os dados no localStorage.
+// Pense nela como o nome da gaveta onde guardamos os registros.
 const STORAGE_KEY = "study-tasks-registros";
 
 // Busca no HTML o elemento onde será exibido o mês atual.
@@ -19,8 +17,20 @@ const formularioRegistro = document.getElementById("registroForm");
 const mensagemStatus = document.getElementById("mensagemStatus");
 
 // Busca todos os elementos que possuem o atributo data-lista-dia.
-// Cada um desses elementos representa uma área onde os cards de um dia serão exibidos.
 const listasDosDias = document.querySelectorAll("[data-lista-dia]");
+
+// Busca os botões de filtro.
+const botoesFiltro = document.querySelectorAll("[data-filtro]");
+
+// Busca os elementos dos contadores.
+const contadorTotal = document.getElementById("contadorTotal");
+const contadorPendentes = document.getElementById("contadorPendentes");
+const contadorConcluidos = document.getElementById("contadorConcluidos");
+const contadorUrgentes = document.getElementById("contadorUrgentes");
+
+// Guarda qual filtro está ativo no momento.
+// Começa mostrando todos.
+let filtroAtual = "todos";
 
 // Cria uma lista com os nomes dos meses em português.
 const nomesDosMeses = [
@@ -51,49 +61,36 @@ if (anoAtual) {
   anoAtual.textContent = dataAtual.getFullYear();
 }
 
-// Função que busca os registros salvos no localStorage.
-// Se não existir nada salvo, ela retorna um array vazio.
+// Busca os registros salvos no localStorage.
+// Se não existir nada salvo, retorna array vazio.
 function carregarRegistrosDoLocalStorage() {
-  // Busca no navegador os dados salvos usando a chave STORAGE_KEY.
   const registrosSalvos = localStorage.getItem(STORAGE_KEY);
 
-  // Se não existir nada salvo, retornamos uma lista vazia.
   if (!registrosSalvos) {
     return [];
   }
 
   try {
-    // JSON.parse transforma o texto JSON de volta em array/objeto JavaScript.
     return JSON.parse(registrosSalvos);
   } catch (erro) {
-    // Se acontecer algum erro ao converter o JSON, mostramos no console.
     console.error("Erro ao carregar registros do localStorage:", erro);
-
-    // Remove os dados inválidos para evitar erro repetido.
     localStorage.removeItem(STORAGE_KEY);
-
-    // Retorna uma lista vazia para o app continuar funcionando.
     return [];
   }
 }
 
-// Função que salva o array registros no localStorage.
-// O localStorage só salva texto, então usamos JSON.stringify.
+// Salva o array registros no localStorage.
+// O localStorage guarda texto, então usamos JSON.stringify.
 function salvarRegistrosNoLocalStorage() {
-  // JSON.stringify transforma o array de objetos em texto JSON.
   const registrosEmTexto = JSON.stringify(registros);
-
-  // Salva o texto JSON no navegador usando a chave STORAGE_KEY.
   localStorage.setItem(STORAGE_KEY, registrosEmTexto);
 }
 
-// Cria o array principal do projeto.
-// Agora ele começa carregando os dados salvos no navegador.
-// Se não houver dados salvos, começa como array vazio.
+// Array principal do projeto.
+// Agora ele inicia com os dados salvos no navegador.
 let registros = carregarRegistrosDoLocalStorage();
 
-// Função que converte a importância em uma classe CSS.
-// Essa classe muda a cor lateral do card.
+// Converte a importância em uma classe CSS.
 function obterClasseImportancia(importancia) {
   if (importancia === "Urgente") {
     return "urgent-border";
@@ -106,52 +103,75 @@ function obterClasseImportancia(importancia) {
   return "low-border";
 }
 
-// Função que cria a mensagem exibida quando um dia não possui registros.
+// Cria a mensagem exibida quando um dia não possui registros.
 function criarMensagemVazia() {
-  return '<div class="empty-message">Nenhum registro ainda.</div>';
+  return '<div class="empty-message">Nenhum registro neste filtro.</div>';
 }
 
-// Função responsável por limpar todas as listas dos dias.
-// Fazemos isso antes de redesenhar os cards atualizados.
+// Limpa todas as listas dos dias antes de redesenhar os cards.
 function limparListasDosDias() {
   listasDosDias.forEach(function (lista) {
     lista.innerHTML = "";
   });
 }
 
-// Função que renderiza as mensagens vazias nos dias sem registros.
-function renderizarMensagensVazias() {
+// Recebe um registro e decide se ele deve aparecer no filtro atual.
+function registroPassaNoFiltro(registro) {
+  if (filtroAtual === "todos") {
+    return true;
+  }
+
+  if (filtroAtual === "pendentes") {
+    return !registro.concluido;
+  }
+
+  if (filtroAtual === "concluidos") {
+    return registro.concluido;
+  }
+
+  if (filtroAtual === "urgentes") {
+    return registro.importancia === "Urgente";
+  }
+
+  if (filtroAtual === "media") {
+    return registro.importancia === "Média";
+  }
+
+  if (filtroAtual === "baixa") {
+    return registro.importancia === "Baixa";
+  }
+
+  return true;
+}
+
+// Retorna uma nova lista apenas com os registros que passam no filtro atual.
+function obterRegistrosFiltrados() {
+  return registros.filter(function (registro) {
+    return registroPassaNoFiltro(registro);
+  });
+}
+
+// Renderiza as mensagens vazias nos dias sem registros filtrados.
+function renderizarMensagensVazias(registrosFiltrados) {
   listasDosDias.forEach(function (lista) {
-    // dataset.listaDia acessa o valor do atributo data-lista-dia.
-    // Exemplo: data-lista-dia="segunda" vira lista.dataset.listaDia.
     const diaDaLista = lista.dataset.listaDia;
 
-    // some verifica se existe pelo menos um registro naquele dia.
-    const existeRegistroNesseDia = registros.some(function (registro) {
+    const existeRegistroNesseDia = registrosFiltrados.some(function (registro) {
       return registro.diaSemana === diaDaLista;
     });
 
-    // Se não existir registro no dia, mostramos a mensagem vazia.
     if (!existeRegistroNesseDia) {
       lista.innerHTML = criarMensagemVazia();
     }
   });
 }
 
-// Função que cria o HTML de um card de registro.
-// Ela recebe um objeto registro e transforma esse objeto em um card visual.
+// Cria o HTML de um card de registro.
 function criarCardRegistro(registro) {
   const classeImportancia = obterClasseImportancia(registro.importancia);
-
-  // Se o registro estiver concluído, adicionamos uma classe extra no card.
   const classeConcluido = registro.concluido ? "task-card-completed" : "";
-
-  // Se estiver concluído, o botão mostra "Reabrir".
-  // Se não estiver concluído, o botão mostra "Concluir".
   const textoBotaoStatus = registro.concluido ? "Reabrir" : "Concluir";
 
-  // O atributo data-id guarda o id do registro no botão.
-  // Assim o JavaScript sabe qual registro deve atualizar ou excluir.
   return `
     <article class="task-card ${classeImportancia} ${classeConcluido}">
       <span class="task-subject">${registro.materia}</span>
@@ -175,12 +195,46 @@ function criarCardRegistro(registro) {
   `;
 }
 
+// Atualiza os contadores superiores do projeto.
+function atualizarContadores() {
+  const total = registros.length;
+
+  const pendentes = registros.filter(function (registro) {
+    return !registro.concluido;
+  }).length;
+
+  const concluidos = registros.filter(function (registro) {
+    return registro.concluido;
+  }).length;
+
+  const urgentes = registros.filter(function (registro) {
+    return registro.importancia === "Urgente";
+  }).length;
+
+  contadorTotal.textContent = total;
+  contadorPendentes.textContent = pendentes;
+  contadorConcluidos.textContent = concluidos;
+  contadorUrgentes.textContent = urgentes;
+}
+
+// Atualiza qual botão de filtro aparece como ativo.
+function atualizarBotaoFiltroAtivo() {
+  botoesFiltro.forEach(function (botao) {
+    if (botao.dataset.filtro === filtroAtual) {
+      botao.classList.add("active");
+    } else {
+      botao.classList.remove("active");
+    }
+  });
+}
+
 // Função principal de renderização.
-// Ela lê o array registros e desenha os cards na tela.
 function renderizarRegistros() {
   limparListasDosDias();
 
-  registros.forEach(function (registro) {
+  const registrosFiltrados = obterRegistrosFiltrados();
+
+  registrosFiltrados.forEach(function (registro) {
     const listaDoDia = document.querySelector(
       `[data-lista-dia="${registro.diaSemana}"]`
     );
@@ -190,10 +244,12 @@ function renderizarRegistros() {
     }
   });
 
-  renderizarMensagensVazias();
+  renderizarMensagensVazias(registrosFiltrados);
+  atualizarContadores();
+  atualizarBotaoFiltroAtivo();
 }
 
-// Função que cria um objeto de registro usando os dados do formulário.
+// Cria um objeto de registro usando os dados do formulário.
 function criarRegistroPeloFormulario() {
   const titulo = document.getElementById("titulo").value.trim();
   const materia = document.getElementById("materia").value;
@@ -202,30 +258,20 @@ function criarRegistroPeloFormulario() {
   const descricao = document.getElementById("descricao").value.trim();
 
   const novoRegistro = {
-    // Date.now cria um número único baseado no horário atual.
-    // Usamos isso como id simples para cada registro.
     id: Date.now(),
-
-    // Dados preenchidos pelo usuário.
     titulo: titulo,
     materia: materia,
     diaSemana: diaSemana,
     importancia: importancia,
     descricao: descricao,
-
-    // Campo usado para controlar se o registro está concluído ou não.
     concluido: false,
-
-    // Guarda a data de criação em formato ISO.
     criadoEm: new Date().toISOString(),
   };
 
   return novoRegistro;
 }
 
-// Função que alterna o status de um registro.
-// Se estiver pendente, vira concluído.
-// Se estiver concluído, volta para pendente.
+// Alterna o status de um registro.
 function alternarStatusRegistro(idRegistro) {
   registros = registros.map(function (registro) {
     if (registro.id === idRegistro) {
@@ -238,10 +284,7 @@ function alternarStatusRegistro(idRegistro) {
     return registro;
   });
 
-  // Depois de alterar o array, salvamos no localStorage.
   salvarRegistrosNoLocalStorage();
-
-  // Depois redesenhamos a tela.
   renderizarRegistros();
 
   mensagemStatus.textContent = "Status do registro atualizado e salvo.";
@@ -249,17 +292,13 @@ function alternarStatusRegistro(idRegistro) {
   console.log("Registro atualizado. Array atual:", registros);
 }
 
-// Função que exclui um registro do array.
-// Usamos filter para criar uma nova lista sem o item excluído.
+// Exclui um registro.
 function excluirRegistro(idRegistro) {
   registros = registros.filter(function (registro) {
     return registro.id !== idRegistro;
   });
 
-  // Depois de excluir do array, salvamos a nova lista no localStorage.
   salvarRegistrosNoLocalStorage();
-
-  // Depois redesenhamos a tela.
   renderizarRegistros();
 
   mensagemStatus.textContent = "Registro excluído e alteração salva.";
@@ -267,32 +306,22 @@ function excluirRegistro(idRegistro) {
   console.log("Registro excluído. Array atual:", registros);
 }
 
-// Verifica se o formulário existe antes de adicionar eventos.
-// Isso evita erro caso o id do formulário esteja diferente no HTML.
+// Evento de cadastro do formulário.
 if (formularioRegistro) {
   formularioRegistro.addEventListener("submit", function (evento) {
-    // Impede o recarregamento da página.
     evento.preventDefault();
 
-    // Cria um objeto com os dados digitados no formulário.
     const novoRegistro = criarRegistroPeloFormulario();
 
-    // Adiciona o novo objeto dentro do array registros.
     registros.push(novoRegistro);
 
-    // Depois de adicionar no array, salvamos no localStorage.
     salvarRegistrosNoLocalStorage();
-
-    // Atualiza a tela com o novo card.
     renderizarRegistros();
 
-    // Limpa os campos do formulário depois do cadastro.
     formularioRegistro.reset();
 
-    // Mostra uma mensagem de confirmação para o usuário.
     mensagemStatus.textContent = "Registro cadastrado e salvo no navegador.";
 
-    // Mostra no console o array atualizado para estudo/debug.
     console.log("Array registros atualizado:", registros);
   });
 
@@ -301,22 +330,15 @@ if (formularioRegistro) {
   });
 }
 
-// Escuta cliques na página inteira.
-// Isso permite capturar cliques nos botões criados dinamicamente pelo JavaScript.
+// Captura cliques nos botões criados dinamicamente.
 document.addEventListener("click", function (evento) {
   const botaoClicado = evento.target.closest("button");
 
-  // Se o clique não foi em um botão, a função para aqui.
   if (!botaoClicado) {
     return;
   }
 
-  // Lê qual ação está no botão.
-  // Exemplo: data-acao="excluir".
   const acao = botaoClicado.dataset.acao;
-
-  // Lê o id do registro e converte para número.
-  // No HTML, dataset sempre vem como texto.
   const idRegistro = Number(botaoClicado.dataset.id);
 
   if (acao === "alternar-status") {
@@ -328,10 +350,21 @@ document.addEventListener("click", function (evento) {
   }
 });
 
+// Captura cliques nos botões de filtro.
+botoesFiltro.forEach(function (botao) {
+  botao.addEventListener("click", function () {
+    filtroAtual = botao.dataset.filtro;
+
+    renderizarRegistros();
+
+    mensagemStatus.textContent = `Filtro aplicado: ${botao.textContent.trim()}.`;
+
+    console.log("Filtro atual:", filtroAtual);
+  });
+});
+
 // Renderiza o estado inicial da tela.
-// Agora, se houver dados salvos no localStorage, eles já aparecem ao abrir a página.
 renderizarRegistros();
 
-// Mensagem inicial no console do navegador.
-console.log("Study Tasks carregado com localStorage.");
+console.log("Study Tasks carregado com filtros e contadores.");
 console.log("Registros carregados:", registros);

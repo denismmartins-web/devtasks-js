@@ -58,6 +58,29 @@
         </div>
       </section>
 
+      <!-- Painel de contadores -->
+      <section class="summary-panel" aria-label="Resumo dos registros">
+        <article class="summary-item">
+          <span>Total</span>
+          <strong id="contadorTotal">0</strong>
+        </article>
+
+        <article class="summary-item">
+          <span>Pendentes</span>
+          <strong id="contadorPendentes">0</strong>
+        </article>
+
+        <article class="summary-item">
+          <span>Concluídos</span>
+          <strong id="contadorConcluidos">0</strong>
+        </article>
+
+        <article class="summary-item">
+          <span>Urgentes</span>
+          <strong id="contadorUrgentes">0</strong>
+        </article>
+      </section>
+
       <!-- Legenda de importância -->
       <section class="legend-card" aria-label="Legenda de importância">
         <div class="legend-item">
@@ -76,6 +99,33 @@
         </div>
       </section>
 
+      <!-- Filtros dos registros -->
+      <section class="filter-panel" aria-label="Filtros de registros">
+        <button class="filter-button active" type="button" data-filtro="todos">
+          Todos
+        </button>
+
+        <button class="filter-button" type="button" data-filtro="pendentes">
+          Pendentes
+        </button>
+
+        <button class="filter-button" type="button" data-filtro="concluidos">
+          Concluídos
+        </button>
+
+        <button class="filter-button" type="button" data-filtro="urgentes">
+          Urgentes
+        </button>
+
+        <button class="filter-button" type="button" data-filtro="media">
+          Média
+        </button>
+
+        <button class="filter-button" type="button" data-filtro="baixa">
+          Baixa
+        </button>
+      </section>
+
       <!-- Layout principal da semana -->
       <section id="semana" class="planner-layout">
         <!-- Quadro principal com os dias úteis -->
@@ -89,7 +139,6 @@
                 </div>
               </header>
 
-              <!-- O JavaScript vai inserir os cards de segunda aqui -->
               <div class="task-list" data-lista-dia="segunda"></div>
             </article>
 
@@ -101,7 +150,6 @@
                 </div>
               </header>
 
-              <!-- O JavaScript vai inserir os cards de terça aqui -->
               <div class="task-list" data-lista-dia="terca"></div>
             </article>
 
@@ -113,7 +161,6 @@
                 </div>
               </header>
 
-              <!-- O JavaScript vai inserir os cards de quarta aqui -->
               <div class="task-list" data-lista-dia="quarta"></div>
             </article>
 
@@ -125,7 +172,6 @@
                 </div>
               </header>
 
-              <!-- O JavaScript vai inserir os cards de quinta aqui -->
               <div class="task-list" data-lista-dia="quinta"></div>
             </article>
 
@@ -137,7 +183,6 @@
                 </div>
               </header>
 
-              <!-- O JavaScript vai inserir os cards de sexta aqui -->
               <div class="task-list" data-lista-dia="sexta"></div>
             </article>
           </div>
@@ -150,7 +195,6 @@
             <h3>Sábado</h3>
             <p>Espaço para simulados, revisões ou tarefas extras.</p>
 
-            <!-- O JavaScript vai inserir os cards de sábado aqui -->
             <div class="task-list" data-lista-dia="sabado"></div>
           </section>
 
@@ -159,7 +203,6 @@
             <h3>Domingo</h3>
             <p>Revise a semana e organize os próximos estudos.</p>
 
-            <!-- O JavaScript vai inserir os cards de domingo aqui -->
             <div class="task-list" data-lista-dia="domingo"></div>
           </section>
 
@@ -185,8 +228,8 @@
             <span>Novo registro</span>
             <h2>Cadastrar estudo ou lembrete</h2>
             <p>
-              Preencha os campos para criar um registro. Nesta branch, os dados
-              ficam em um array enquanto a página estiver aberta.
+              Preencha os campos para criar um registro. Os dados são salvos no
+              navegador com localStorage.
             </p>
           </div>
 
