@@ -84,37 +84,25 @@
             <article class="day-column">
               <header>
                 <div>
-                  <span class="day-dot urgent"></span>
+                  <span class="day-dot low"></span>
                   <h3>Segunda</h3>
                 </div>
               </header>
 
-              <div class="task-list">
-                <article class="task-card urgent-border">
-                  <span class="task-subject">Matemática</span>
-                  <h4>Função do 2º grau</h4>
-                  <p>Revisar gráficos, raízes e exercícios.</p>
-                  <small>Urgente</small>
-                </article>
-              </div>
+              <!-- O JavaScript vai inserir os cards de segunda aqui -->
+              <div class="task-list" data-lista-dia="segunda"></div>
             </article>
 
             <article class="day-column">
               <header>
                 <div>
-                  <span class="day-dot medium"></span>
+                  <span class="day-dot low"></span>
                   <h3>Terça</h3>
                 </div>
               </header>
 
-              <div class="task-list">
-                <article class="task-card medium-border">
-                  <span class="task-subject">História</span>
-                  <h4>Revolução Industrial</h4>
-                  <p>Criar resumo com os principais pontos.</p>
-                  <small>Média</small>
-                </article>
-              </div>
+              <!-- O JavaScript vai inserir os cards de terça aqui -->
+              <div class="task-list" data-lista-dia="terca"></div>
             </article>
 
             <article class="day-column">
@@ -125,9 +113,8 @@
                 </div>
               </header>
 
-              <div class="task-list">
-                <div class="empty-message">Nenhum registro ainda.</div>
-              </div>
+              <!-- O JavaScript vai inserir os cards de quarta aqui -->
+              <div class="task-list" data-lista-dia="quarta"></div>
             </article>
 
             <article class="day-column">
@@ -138,27 +125,20 @@
                 </div>
               </header>
 
-              <div class="task-list">
-                <article class="task-card low-border">
-                  <span class="task-subject">Inglês</span>
-                  <h4>Vocabulário</h4>
-                  <p>Revisar palavras novas e criar frases simples.</p>
-                  <small>Baixa</small>
-                </article>
-              </div>
+              <!-- O JavaScript vai inserir os cards de quinta aqui -->
+              <div class="task-list" data-lista-dia="quinta"></div>
             </article>
 
             <article class="day-column">
               <header>
                 <div>
-                  <span class="day-dot medium"></span>
+                  <span class="day-dot low"></span>
                   <h3>Sexta</h3>
                 </div>
               </header>
 
-              <div class="task-list">
-                <div class="empty-message">Nenhum registro ainda.</div>
-              </div>
+              <!-- O JavaScript vai inserir os cards de sexta aqui -->
+              <div class="task-list" data-lista-dia="sexta"></div>
             </article>
           </div>
         </div>
@@ -169,12 +149,18 @@
             <span class="side-kicker">Fim de semana</span>
             <h3>Sábado</h3>
             <p>Espaço para simulados, revisões ou tarefas extras.</p>
+
+            <!-- O JavaScript vai inserir os cards de sábado aqui -->
+            <div class="task-list" data-lista-dia="sabado"></div>
           </section>
 
           <section class="weekend-card">
             <span class="side-kicker">Planejamento</span>
             <h3>Domingo</h3>
             <p>Revise a semana e organize os próximos estudos.</p>
+
+            <!-- O JavaScript vai inserir os cards de domingo aqui -->
+            <div class="task-list" data-lista-dia="domingo"></div>
           </section>
 
           <section class="todo-card">
@@ -193,14 +179,14 @@
 
       <!-- Parte inferior: formulário, notas e lembretes -->
       <section class="bottom-layout">
-        <!-- Formulário visual -->
+        <!-- Formulário de cadastro -->
         <article id="novo-registro" class="form-card">
           <div class="section-title">
             <span>Novo registro</span>
             <h2>Cadastrar estudo ou lembrete</h2>
             <p>
-              Nesta etapa, o formulário ainda é visual. Na próxima branch, ele
-              vai criar cards dinamicamente com JavaScript.
+              Preencha os campos para criar um registro. Nesta branch, os dados
+              ficam em um array enquanto a página estiver aberta.
             </p>
           </div>
 
@@ -274,7 +260,7 @@
             </div>
 
             <p id="mensagemStatus" class="form-message">
-              Aguardando implementação do cadastro com JavaScript.
+              Nenhum registro cadastrado ainda.
             </p>
           </form>
         </article>
@@ -311,9 +297,7 @@
 
     <!-- Rodapé da página -->
     <footer class="app-footer">
-      <p>
-        Study Tasks — Projeto prático do repositório devtasks-js.
-      </p>
+      <p>Study Tasks — Projeto prático do repositório devtasks-js.</p>
     </footer>
 
     <!-- Conexão com o JavaScript -->

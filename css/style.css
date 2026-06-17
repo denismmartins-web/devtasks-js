@@ -869,3 +869,51 @@ textarea {
     width: 100%;
   }
 }
+
+/* Área dos botões dentro dos cards criados pelo JavaScript */
+.task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Botões internos dos cards */
+.task-actions button {
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Efeito ao passar o mouse nos botões dos cards */
+.task-actions button:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+  color: var(--text);
+  background: rgba(124, 140, 255, 0.16);
+}
+
+/* Visual do card quando o registro estiver concluído */
+.task-card-completed {
+  opacity: 0.68;
+}
+
+/* Risca o título do card concluído */
+.task-card-completed h4 {
+  text-decoration: line-through;
+}
+
+/* Muda a cor da etiqueta do card concluído */
+.task-card-completed small {
+  color: var(--low);
+}
