@@ -1,0 +1,871 @@
+/* Remove margens e espaçamentos padrões do navegador */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Variáveis principais do layout futurista azul/roxo */
+:root {
+  /* Fundos principais */
+  --bg: #070914;
+  --bg-soft: #10162a;
+  --surface: rgba(16, 22, 42, 0.84);
+  --surface-strong: rgba(24, 32, 58, 0.96);
+  --surface-light: rgba(255, 255, 255, 0.06);
+
+  /* Textos */
+  --text: #f6f7ff;
+  --muted: #aeb7d4;
+  --muted-strong: #dfe5ff;
+
+  /* Linhas e sombras */
+  --line: rgba(180, 198, 255, 0.16);
+  --line-strong: rgba(180, 198, 255, 0.34);
+  --shadow-soft: 0 24px 70px rgba(0, 0, 0, 0.38);
+  --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.24);
+
+  /* Cores de importância */
+  --urgent: #ff4d6d;
+  --urgent-soft: rgba(255, 77, 109, 0.14);
+
+  --medium: #ffd166;
+  --medium-soft: rgba(255, 209, 102, 0.15);
+
+  --low: #38d996;
+  --low-soft: rgba(56, 217, 150, 0.15);
+
+  /* Cores principais do visual futurista */
+  --accent: #7c8cff;
+  --accent-dark: #5865f2;
+  --accent-blue: #5cc8ff;
+  --accent-purple: #a855f7;
+
+  /* Bordas */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+
+  /* Largura máxima do conteúdo */
+  --container: 1180px;
+}
+
+/* Rolagem suave ao clicar nos links do menu */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Corpo geral da página */
+body {
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(124, 140, 255, 0.22), transparent 30%),
+    radial-gradient(circle at 88% 12%, rgba(168, 85, 247, 0.18), transparent 28%),
+    radial-gradient(circle at 80% 82%, rgba(92, 200, 255, 0.12), transparent 26%),
+    linear-gradient(135deg, #050713, var(--bg) 48%, #11162d);
+  line-height: 1.5;
+}
+
+/* Cria uma grade sutil no fundo para dar aparência tecnológica */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(180, 198, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180, 198, 255, 0.04) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 82%);
+}
+
+/* Container central reutilizável */
+.container {
+  width: min(100% - 32px, var(--container));
+  margin: 0 auto;
+}
+
+/* Cabeçalho principal */
+.app-header {
+  padding: 32px 0 22px;
+}
+
+/* Organização do conteúdo do cabeçalho */
+.header-content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* Área do título */
+.brand-area {
+  max-width: 760px;
+}
+
+/* Etiquetas pequenas usadas no layout */
+.app-label,
+.section-kicker,
+.side-kicker {
+  display: inline-flex;
+  margin-bottom: 8px;
+  color: var(--accent-blue);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.7px;
+}
+
+/* Título principal da página */
+.app-header h1 {
+  font-size: clamp(2.8rem, 8vw, 6.2rem);
+  line-height: 0.9;
+  letter-spacing: -3px;
+  color: var(--text);
+  text-shadow: 0 0 28px rgba(124, 140, 255, 0.28);
+}
+
+/* Texto abaixo do título */
+.app-header p {
+  max-width: 620px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+/* Navegação superior */
+.header-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Links da navegação */
+.header-nav a {
+  padding: 11px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.88rem;
+  font-weight: 900;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Efeito visual dos links */
+.header-nav a:hover {
+  transform: translateY(-2px);
+  color: var(--text);
+  border-color: var(--accent);
+  background: rgba(124, 140, 255, 0.12);
+  box-shadow: 0 0 24px rgba(124, 140, 255, 0.18);
+}
+
+/* Espaçamento inferior do conteúdo principal */
+.app-main {
+  padding-bottom: 46px;
+}
+
+/* Área superior do planner */
+.planner-top {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: stretch;
+  margin: 18px 0 16px;
+}
+
+/* Card principal de apresentação */
+.planner-title-card {
+  position: relative;
+  overflow: hidden;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    145deg,
+    rgba(24, 32, 58, 0.94),
+    rgba(10, 14, 30, 0.94)
+  );
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px);
+}
+
+/* Linha luminosa decorativa do card principal */
+.planner-title-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--accent-blue),
+    var(--accent),
+    var(--accent-purple)
+  );
+}
+
+/* Título do card principal */
+.planner-title-card h2 {
+  max-width: 760px;
+  font-size: clamp(1.9rem, 4vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -1.4px;
+}
+
+/* Texto do card principal */
+.planner-title-card p {
+  max-width: 690px;
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+/* Painel de mês e ano */
+.date-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* Cards de mês e ano */
+.date-panel article {
+  display: grid;
+  align-content: center;
+  min-height: 102px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+/* Rótulo de mês e ano */
+.date-panel span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+}
+
+/* Valor de mês e ano */
+.date-panel strong {
+  margin-top: 4px;
+  color: var(--accent-blue);
+  font-size: 1.65rem;
+}
+
+/* Card da legenda */
+.legend-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+/* Cada item da legenda */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted-strong);
+  font-size: 0.92rem;
+}
+
+/* Bolinhas de identificação */
+.dot,
+.day-dot {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+/* Bolinha da legenda */
+.dot {
+  width: 13px;
+  height: 13px;
+}
+
+/* Bolinha do dia */
+.day-dot {
+  width: 11px;
+  height: 11px;
+}
+
+/* Cor urgente */
+.urgent {
+  background: var(--urgent);
+  box-shadow: 0 0 16px rgba(255, 77, 109, 0.45);
+}
+
+/* Cor média */
+.medium {
+  background: var(--medium);
+  box-shadow: 0 0 16px rgba(255, 209, 102, 0.45);
+}
+
+/* Cor baixa */
+.low {
+  background: var(--low);
+  box-shadow: 0 0 16px rgba(56, 217, 150, 0.45);
+}
+
+/* Layout principal: semana + lateral */
+.planner-layout {
+  display: grid;
+  grid-template-columns: 1fr 310px;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Quadro principal da semana */
+.week-board {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px);
+}
+
+/* Grade dos dias úteis */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  min-height: 410px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Coluna de cada dia */
+.day-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 410px;
+  border-right: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Remove borda do último dia */
+.day-column:last-child {
+  border-right: none;
+}
+
+/* Cabeçalho do dia */
+.day-column header {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+/* Organiza bolinha e nome do dia */
+.day-column header div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Nome do dia */
+.day-column h3 {
+  color: var(--muted-strong);
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+}
+
+/* Lista de tarefas dentro do dia */
+.task-list {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  flex: 1;
+  padding: 12px;
+}
+
+/* Card de tarefa */
+.task-card {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.075);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Efeito hover dos cards de tarefa */
+.task-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+/* Matéria da tarefa */
+.task-subject {
+  display: inline-flex;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Título da tarefa */
+.task-card h4 {
+  margin-bottom: 4px;
+  color: var(--text);
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+/* Descrição da tarefa */
+.task-card p {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+/* Grau de importância dentro do card */
+.task-card small {
+  display: inline-flex;
+  margin-top: 10px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.09);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+/* Card urgente com vermelho */
+.urgent-border {
+  border-left-color: var(--urgent);
+  background: linear-gradient(
+    145deg,
+    var(--urgent-soft),
+    rgba(255, 255, 255, 0.055)
+  );
+}
+
+/* Card médio com amarelo */
+.medium-border {
+  border-left-color: var(--medium);
+  background: linear-gradient(
+    145deg,
+    var(--medium-soft),
+    rgba(255, 255, 255, 0.055)
+  );
+}
+
+/* Card baixo com verde */
+.low-border {
+  border-left-color: var(--low);
+  background: linear-gradient(
+    145deg,
+    var(--low-soft),
+    rgba(255, 255, 255, 0.055)
+  );
+}
+
+/* Mensagem de dia vazio */
+.empty-message {
+  padding: 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Coluna lateral */
+.side-panel {
+  display: grid;
+  gap: 16px;
+}
+
+/* Cards laterais e inferiores */
+.weekend-card,
+.todo-card,
+.form-card,
+.notes-card,
+.remember-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+/* Cards de sábado/domingo */
+.weekend-card {
+  padding: 18px;
+}
+
+/* Títulos laterais */
+.weekend-card h3,
+.todo-card h3,
+.notes-card h3,
+.remember-card h3 {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+/* Texto dos cards laterais */
+.weekend-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* Card de lista rápida */
+.todo-card {
+  padding: 18px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 209, 102, 0.15),
+    rgba(16, 22, 42, 0.86)
+  );
+}
+
+/* Lista rápida */
+.todo-card ul,
+.remember-card ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+}
+
+/* Item da lista rápida */
+.todo-card li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted-strong);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Quadrado de checklist */
+.todo-card li span {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border: 1px solid rgba(255, 209, 102, 0.75);
+  border-radius: 5px;
+  background: rgba(255, 209, 102, 0.08);
+}
+
+/* Layout inferior */
+.bottom-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 310px;
+  gap: 16px;
+  align-items: stretch;
+  margin-top: 16px;
+}
+
+/* Card do formulário */
+.form-card {
+  padding: 22px;
+}
+
+/* Título da seção do formulário */
+.section-title span {
+  color: var(--accent-blue);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* Título do formulário */
+.section-title h2 {
+  margin: 4px 0 8px;
+  color: var(--text);
+  font-size: 1.45rem;
+}
+
+/* Descrição da seção */
+.section-title p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* Formulário */
+.study-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* Labels do formulário */
+.study-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted-strong);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+/* Campo que ocupa a largura completa */
+.full-field {
+  grid-column: 1 / -1;
+}
+
+/* Campos do formulário */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.065);
+  font: inherit;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+/* Cor do texto de placeholder */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(223, 229, 255, 0.48);
+}
+
+/* Cor das opções do select */
+select option {
+  color: #111827;
+}
+
+/* Efeito de foco nos campos */
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 0 4px rgba(124, 140, 255, 0.14);
+}
+
+/* Permite aumentar o textarea apenas na vertical */
+textarea {
+  resize: vertical;
+}
+
+/* Área dos botões */
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botões do formulário */
+.form-actions button {
+  position: relative;
+  overflow: hidden;
+  padding: 12px 18px;
+  border: 1px solid rgba(124, 140, 255, 0.8);
+  border-radius: 999px;
+  color: #050713;
+  background: linear-gradient(135deg, var(--accent), #aab4ff);
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(124, 140, 255, 0.22);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+/* Brilho interno dos botões */
+.form-actions button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.42),
+    transparent
+  );
+  transform: translateX(-120%);
+  transition: transform 0.45s ease;
+}
+
+/* Efeito hover dos botões */
+.form-actions button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 0 34px rgba(124, 140, 255, 0.32);
+}
+
+/* Movimento do brilho no hover */
+.form-actions button:hover::before {
+  transform: translateX(120%);
+}
+
+/* Botão de limpar */
+.form-actions button[type="reset"] {
+  color: var(--muted-strong);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: none;
+}
+
+/* Mensagem abaixo do formulário */
+.form-message {
+  grid-column: 1 / -1;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.045);
+  font-size: 0.9rem;
+}
+
+/* Card de anotações */
+.notes-card {
+  padding: 22px;
+  background: linear-gradient(
+    145deg,
+    rgba(124, 140, 255, 0.14),
+    rgba(16, 22, 42, 0.86)
+  );
+}
+
+/* Linhas de anotação */
+.note-lines {
+  display: grid;
+  gap: 15px;
+  margin-top: 22px;
+}
+
+/* Cada linha simulada */
+.note-lines span {
+  display: block;
+  height: 1px;
+  background: rgba(180, 198, 255, 0.46);
+}
+
+/* Card de lembretes */
+.remember-card {
+  padding: 22px;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 77, 109, 0.13),
+    rgba(16, 22, 42, 0.86)
+  );
+}
+
+/* Itens de lembrete */
+.remember-card li {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted-strong);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+/* Remove a linha do último item */
+.remember-card li:last-child {
+  border-bottom: none;
+}
+
+/* Rodapé */
+.app-footer {
+  padding: 24px 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  background: rgba(5, 7, 19, 0.78);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Ajuste para telas médias */
+@media (max-width: 1020px) {
+  .planner-top,
+  .planner-layout,
+  .bottom-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .date-panel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .week-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .day-column {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .day-column:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Ajuste para celulares */
+@media (max-width: 640px) {
+  .header-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .app-header h1 {
+    letter-spacing: -1px;
+  }
+
+  .date-panel,
+  .week-grid,
+  .study-form {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-title-card,
+  .week-board,
+  .form-card,
+  .notes-card,
+  .remember-card {
+    padding: 18px;
+  }
+
+  .header-nav a {
+    font-size: 0.85rem;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
