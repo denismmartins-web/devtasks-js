@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <!-- Permite o uso correto de acentos e caracteres especiais -->
+    <meta charset="UTF-8" />
+
+    <!-- Faz a página se adaptar em celular, tablet e computador -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Título exibido na aba do navegador -->
+    <title>Study Tasks | Planner Semanal</title>
+
+    <!-- Conexão com o arquivo CSS -->
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+
+  <body>
+    <!-- Cabeçalho principal da página -->
+    <header class="app-header">
+      <div class="container header-content">
+        <div class="brand-area">
+          <span class="app-label">Planner semanal</span>
+          <h1>Study Tasks</h1>
+          <p>Organize estudos, tarefas, revisões e lembretes da semana.</p>
+        </div>
+
+        <nav class="header-nav" aria-label="Navegação principal">
+          <a href="#semana">Semana</a>
+          <a href="#novo-registro">Novo registro</a>
+          <a href="#anotacoes">Anotações</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Conteúdo principal do planner -->
+    <main class="container app-main">
+      <!-- Área superior com mês, ano e descrição -->
+      <section class="planner-top">
+        <div class="planner-title-card">
+          <span class="section-kicker">Study Tasks</span>
+          <h2>Planejamento semanal de estudos</h2>
+          <p>
+            Distribua suas atividades por dia da semana e acompanhe o que é
+            urgente, médio ou de baixa prioridade.
+          </p>
+        </div>
+
+        <div class="date-panel">
+          <article>
+            <span>Mês</span>
+            <strong id="mesAtual">---</strong>
+          </article>
+
+          <article>
+            <span>Ano</span>
+            <strong id="anoAtual">----</strong>
+          </article>
+        </div>
+      </section>
+
+      <!-- Legenda de importância -->
+      <section class="legend-card" aria-label="Legenda de importância">
+        <div class="legend-item">
+          <span class="dot urgent"></span>
+          <strong>Urgente</strong>
+        </div>
+
+        <div class="legend-item">
+          <span class="dot medium"></span>
+          <strong>Média</strong>
+        </div>
+
+        <div class="legend-item">
+          <span class="dot low"></span>
+          <strong>Baixa</strong>
+        </div>
+      </section>
+
+      <!-- Layout principal da semana -->
+      <section id="semana" class="planner-layout">
+        <!-- Quadro principal com os dias úteis -->
+        <div class="week-board">
+          <div class="week-grid">
+            <article class="day-column">
+              <header>
+                <div>
+                  <span class="day-dot urgent"></span>
+                  <h3>Segunda</h3>
+                </div>
+              </header>
+
+              <div class="task-list">
+                <article class="task-card urgent-border">
+                  <span class="task-subject">Matemática</span>
+                  <h4>Função do 2º grau</h4>
+                  <p>Revisar gráficos, raízes e exercícios.</p>
+                  <small>Urgente</small>
+                </article>
+              </div>
+            </article>
+
+            <article class="day-column">
+              <header>
+                <div>
+                  <span class="day-dot medium"></span>
+                  <h3>Terça</h3>
+                </div>
+              </header>
+
+              <div class="task-list">
+                <article class="task-card medium-border">
+                  <span class="task-subject">História</span>
+                  <h4>Revolução Industrial</h4>
+                  <p>Criar resumo com os principais pontos.</p>
+                  <small>Média</small>
+                </article>
+              </div>
+            </article>
+
+            <article class="day-column">
+              <header>
+                <div>
+                  <span class="day-dot low"></span>
+                  <h3>Quarta</h3>
+                </div>
+              </header>
+
+              <div class="task-list">
+                <div class="empty-message">Nenhum registro ainda.</div>
+              </div>
+            </article>
+
+            <article class="day-column">
+              <header>
+                <div>
+                  <span class="day-dot low"></span>
+                  <h3>Quinta</h3>
+                </div>
+              </header>
+
+              <div class="task-list">
+                <article class="task-card low-border">
+                  <span class="task-subject">Inglês</span>
+                  <h4>Vocabulário</h4>
+                  <p>Revisar palavras novas e criar frases simples.</p>
+                  <small>Baixa</small>
+                </article>
+              </div>
+            </article>
+
+            <article class="day-column">
+              <header>
+                <div>
+                  <span class="day-dot medium"></span>
+                  <h3>Sexta</h3>
+                </div>
+              </header>
+
+              <div class="task-list">
+                <div class="empty-message">Nenhum registro ainda.</div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- Coluna lateral com fim de semana e tarefas rápidas -->
+        <aside class="side-panel">
+          <section class="weekend-card">
+            <span class="side-kicker">Fim de semana</span>
+            <h3>Sábado</h3>
+            <p>Espaço para simulados, revisões ou tarefas extras.</p>
+          </section>
+
+          <section class="weekend-card">
+            <span class="side-kicker">Planejamento</span>
+            <h3>Domingo</h3>
+            <p>Revise a semana e organize os próximos estudos.</p>
+          </section>
+
+          <section class="todo-card">
+            <span class="side-kicker">Lista rápida</span>
+            <h3>Fazer agora ou depois</h3>
+
+            <ul>
+              <li><span></span> Separar material de estudo</li>
+              <li><span></span> Revisar anotações</li>
+              <li><span></span> Fazer exercícios</li>
+              <li><span></span> Organizar próxima semana</li>
+            </ul>
+          </section>
+        </aside>
+      </section>
+
+      <!-- Parte inferior: formulário, notas e lembretes -->
+      <section class="bottom-layout">
+        <!-- Formulário visual -->
+        <article id="novo-registro" class="form-card">
+          <div class="section-title">
+            <span>Novo registro</span>
+            <h2>Cadastrar estudo ou lembrete</h2>
+            <p>
+              Nesta etapa, o formulário ainda é visual. Na próxima branch, ele
+              vai criar cards dinamicamente com JavaScript.
+            </p>
+          </div>
+
+          <form id="registroForm" class="study-form">
+            <label>
+              Título
+              <input
+                type="text"
+                id="titulo"
+                name="titulo"
+                placeholder="Ex: Estudar equações"
+                required
+              />
+            </label>
+
+            <label>
+              Matéria
+              <select id="materia" name="materia" required>
+                <option value="">Selecione</option>
+                <option value="Matemática">Matemática</option>
+                <option value="Português">Português</option>
+                <option value="História">História</option>
+                <option value="Geografia">Geografia</option>
+                <option value="Biologia">Biologia</option>
+                <option value="Química">Química</option>
+                <option value="Física">Física</option>
+                <option value="Inglês">Inglês</option>
+                <option value="Redação">Redação</option>
+                <option value="Tecnologia">Tecnologia</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </label>
+
+            <label>
+              Dia da semana
+              <select id="diaSemana" name="diaSemana" required>
+                <option value="">Selecione</option>
+                <option value="segunda">Segunda</option>
+                <option value="terca">Terça</option>
+                <option value="quarta">Quarta</option>
+                <option value="quinta">Quinta</option>
+                <option value="sexta">Sexta</option>
+                <option value="sabado">Sábado</option>
+                <option value="domingo">Domingo</option>
+              </select>
+            </label>
+
+            <label>
+              Importância
+              <select id="importancia" name="importancia" required>
+                <option value="">Selecione</option>
+                <option value="Urgente">Urgente</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
+              </select>
+            </label>
+
+            <label class="full-field">
+              Descrição
+              <textarea
+                id="descricao"
+                name="descricao"
+                rows="4"
+                placeholder="Ex: Revisar teoria, fazer exercícios e anotar dúvidas."
+              ></textarea>
+            </label>
+
+            <div class="form-actions">
+              <button type="submit">Adicionar registro</button>
+              <button type="reset">Limpar</button>
+            </div>
+
+            <p id="mensagemStatus" class="form-message">
+              Aguardando implementação do cadastro com JavaScript.
+            </p>
+          </form>
+        </article>
+
+        <!-- Bloco de anotações -->
+        <article id="anotacoes" class="notes-card">
+          <span class="side-kicker">Anotações</span>
+          <h3>Notas para esta ou próxima semana</h3>
+
+          <div class="note-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </article>
+
+        <!-- Bloco de lembretes -->
+        <article class="remember-card">
+          <span class="side-kicker">Lembretes</span>
+          <h3>Não esquecer</h3>
+
+          <ul>
+            <li>Revisar matérias difíceis</li>
+            <li>Separar dúvidas</li>
+            <li>Conferir datas de prova</li>
+            <li>Atualizar planner semanal</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <!-- Rodapé da página -->
+    <footer class="app-footer">
+      <p>
+        Study Tasks — Projeto prático do repositório devtasks-js.
+      </p>
+    </footer>
+
+    <!-- Conexão com o JavaScript -->
+    <script src="./js/script.js"></script>
+  </body>
+</html>
