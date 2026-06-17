@@ -2,6 +2,10 @@
 // Isso ajuda a evitar alguns erros comuns durante o desenvolvimento.
 "use strict";
 
+// Cria uma chave fixa para salvar e buscar os dados no localStorage.
+// Essa chave funciona como o "nome da gaveta" onde os registros serão guardados.
+const STORAGE_KEY = "study-tasks-registros";
+
 // Busca no HTML o elemento onde será exibido o mês atual.
 const mesAtual = document.getElementById("mesAtual");
 
@@ -47,11 +51,46 @@ if (anoAtual) {
   anoAtual.textContent = dataAtual.getFullYear();
 }
 
+// Função que busca os registros salvos no localStorage.
+// Se não existir nada salvo, ela retorna um array vazio.
+function carregarRegistrosDoLocalStorage() {
+  // Busca no navegador os dados salvos usando a chave STORAGE_KEY.
+  const registrosSalvos = localStorage.getItem(STORAGE_KEY);
+
+  // Se não existir nada salvo, retornamos uma lista vazia.
+  if (!registrosSalvos) {
+    return [];
+  }
+
+  try {
+    // JSON.parse transforma o texto JSON de volta em array/objeto JavaScript.
+    return JSON.parse(registrosSalvos);
+  } catch (erro) {
+    // Se acontecer algum erro ao converter o JSON, mostramos no console.
+    console.error("Erro ao carregar registros do localStorage:", erro);
+
+    // Remove os dados inválidos para evitar erro repetido.
+    localStorage.removeItem(STORAGE_KEY);
+
+    // Retorna uma lista vazia para o app continuar funcionando.
+    return [];
+  }
+}
+
+// Função que salva o array registros no localStorage.
+// O localStorage só salva texto, então usamos JSON.stringify.
+function salvarRegistrosNoLocalStorage() {
+  // JSON.stringify transforma o array de objetos em texto JSON.
+  const registrosEmTexto = JSON.stringify(registros);
+
+  // Salva o texto JSON no navegador usando a chave STORAGE_KEY.
+  localStorage.setItem(STORAGE_KEY, registrosEmTexto);
+}
+
 // Cria o array principal do projeto.
-// Ele funciona como uma "mini tabela temporária" em memória.
-// Nesta etapa, ainda não estamos usando localStorage.
-// Por isso, se atualizar a página, os registros somem.
-let registros = [];
+// Agora ele começa carregando os dados salvos no navegador.
+// Se não houver dados salvos, começa como array vazio.
+let registros = carregarRegistrosDoLocalStorage();
 
 // Função que converte a importância em uma classe CSS.
 // Essa classe muda a cor lateral do card.
@@ -83,12 +122,16 @@ function limparListasDosDias() {
 // Função que renderiza as mensagens vazias nos dias sem registros.
 function renderizarMensagensVazias() {
   listasDosDias.forEach(function (lista) {
+    // dataset.listaDia acessa o valor do atributo data-lista-dia.
+    // Exemplo: data-lista-dia="segunda" vira lista.dataset.listaDia.
     const diaDaLista = lista.dataset.listaDia;
 
+    // some verifica se existe pelo menos um registro naquele dia.
     const existeRegistroNesseDia = registros.some(function (registro) {
       return registro.diaSemana === diaDaLista;
     });
 
+    // Se não existir registro no dia, mostramos a mensagem vazia.
     if (!existeRegistroNesseDia) {
       lista.innerHTML = criarMensagemVazia();
     }
@@ -159,13 +202,21 @@ function criarRegistroPeloFormulario() {
   const descricao = document.getElementById("descricao").value.trim();
 
   const novoRegistro = {
+    // Date.now cria um número único baseado no horário atual.
+    // Usamos isso como id simples para cada registro.
     id: Date.now(),
+
+    // Dados preenchidos pelo usuário.
     titulo: titulo,
     materia: materia,
     diaSemana: diaSemana,
     importancia: importancia,
     descricao: descricao,
+
+    // Campo usado para controlar se o registro está concluído ou não.
     concluido: false,
+
+    // Guarda a data de criação em formato ISO.
     criadoEm: new Date().toISOString(),
   };
 
@@ -187,9 +238,13 @@ function alternarStatusRegistro(idRegistro) {
     return registro;
   });
 
+  // Depois de alterar o array, salvamos no localStorage.
+  salvarRegistrosNoLocalStorage();
+
+  // Depois redesenhamos a tela.
   renderizarRegistros();
 
-  mensagemStatus.textContent = "Status do registro atualizado com sucesso.";
+  mensagemStatus.textContent = "Status do registro atualizado e salvo.";
 
   console.log("Registro atualizado. Array atual:", registros);
 }
@@ -201,9 +256,13 @@ function excluirRegistro(idRegistro) {
     return registro.id !== idRegistro;
   });
 
+  // Depois de excluir do array, salvamos a nova lista no localStorage.
+  salvarRegistrosNoLocalStorage();
+
+  // Depois redesenhamos a tela.
   renderizarRegistros();
 
-  mensagemStatus.textContent = "Registro excluído com sucesso.";
+  mensagemStatus.textContent = "Registro excluído e alteração salva.";
 
   console.log("Registro excluído. Array atual:", registros);
 }
@@ -221,6 +280,9 @@ if (formularioRegistro) {
     // Adiciona o novo objeto dentro do array registros.
     registros.push(novoRegistro);
 
+    // Depois de adicionar no array, salvamos no localStorage.
+    salvarRegistrosNoLocalStorage();
+
     // Atualiza a tela com o novo card.
     renderizarRegistros();
 
@@ -228,7 +290,7 @@ if (formularioRegistro) {
     formularioRegistro.reset();
 
     // Mostra uma mensagem de confirmação para o usuário.
-    mensagemStatus.textContent = "Registro cadastrado com sucesso nesta sessão.";
+    mensagemStatus.textContent = "Registro cadastrado e salvo no navegador.";
 
     // Mostra no console o array atualizado para estudo/debug.
     console.log("Array registros atualizado:", registros);
@@ -244,11 +306,17 @@ if (formularioRegistro) {
 document.addEventListener("click", function (evento) {
   const botaoClicado = evento.target.closest("button");
 
+  // Se o clique não foi em um botão, a função para aqui.
   if (!botaoClicado) {
     return;
   }
 
+  // Lê qual ação está no botão.
+  // Exemplo: data-acao="excluir".
   const acao = botaoClicado.dataset.acao;
+
+  // Lê o id do registro e converte para número.
+  // No HTML, dataset sempre vem como texto.
   const idRegistro = Number(botaoClicado.dataset.id);
 
   if (acao === "alternar-status") {
@@ -261,8 +329,9 @@ document.addEventListener("click", function (evento) {
 });
 
 // Renderiza o estado inicial da tela.
-// Como o array começa vazio, todos os dias mostram "Nenhum registro ainda".
+// Agora, se houver dados salvos no localStorage, eles já aparecem ao abrir a página.
 renderizarRegistros();
 
 // Mensagem inicial no console do navegador.
-console.log("DevTasks JS carregado. CRUD em memória iniciado.");
+console.log("Study Tasks carregado com localStorage.");
+console.log("Registros carregados:", registros);
