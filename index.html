@@ -15,6 +15,22 @@
   </head>
 
   <body>
+    <!-- Canvas usado pelo JavaScript para desenhar estrelas e meteoros no fundo -->
+    <canvas id="space-canvas" aria-hidden="true"></canvas>
+
+    <!-- Quadrados neon decorativos no fundo -->
+    <div class="neon-squares" aria-hidden="true">
+      <span class="square large" data-color="purple" style="left: 6%; top: 12%; --d: 9s"></span>
+      <span class="square" data-color="blue" style="left: 22%; top: 28%; --d: 7.5s"></span>
+      <span class="square small" data-color="pink" style="left: 40%; top: 8%; --d: 6.8s"></span>
+      <span class="square" data-color="blue" style="left: 62%; top: 20%; --d: 8.6s"></span>
+      <span class="square large" data-color="purple" style="left: 80%; top: 6%; --d: 10s"></span>
+      <span class="square" data-color="pink" style="left: 12%; top: 68%; --d: 9.2s"></span>
+      <span class="square small" data-color="blue" style="left: 36%; top: 58%; --d: 7.2s"></span>
+      <span class="square" data-color="purple" style="left: 58%; top: 72%; --d: 8.2s"></span>
+      <span class="square small" data-color="pink" style="left: 78%; top: 50%; --d: 6.6s"></span>
+    </div>
+
     <!-- Cabeçalho principal da página -->
     <header class="app-header">
       <div class="container header-content">
@@ -222,14 +238,14 @@
 
       <!-- Parte inferior: formulário, notas e lembretes -->
       <section class="bottom-layout">
-        <!-- Formulário de cadastro -->
+        <!-- Formulário de cadastro e edição -->
         <article id="novo-registro" class="form-card">
           <div class="section-title">
             <span>Novo registro</span>
             <h2>Cadastrar estudo ou lembrete</h2>
             <p>
-              Preencha os campos para criar um registro. Os dados são salvos no
-              navegador com localStorage.
+              Preencha os campos para criar ou editar um registro. Os dados são
+              salvos no navegador com localStorage.
             </p>
           </div>
 
@@ -298,8 +314,13 @@
             </label>
 
             <div class="form-actions">
-              <button type="submit">Adicionar registro</button>
-              <button type="reset">Limpar</button>
+              <button id="botaoSubmit" type="submit">Adicionar registro</button>
+
+              <button id="botaoLimpar" type="reset">Limpar</button>
+
+              <button id="botaoCancelarEdicao" class="hidden" type="button">
+                Cancelar edição
+              </button>
             </div>
 
             <p id="mensagemStatus" class="form-message">
