@@ -79,6 +79,134 @@ body::before {
     linear-gradient(90deg, rgba(180, 198, 255, 0.04) 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent 82%);
+  z-index: 0;
+}
+
+/* Canvas de fundo com estrelas e meteoros */
+#space-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Quadrados neon decorativos no fundo */
+.neon-squares {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Cada quadrado neon */
+.neon-squares .square {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  opacity: 0.62;
+  transform: translate3d(0, 0, 0);
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    135deg,
+    rgba(92, 200, 255, 0.12),
+    rgba(168, 85, 247, 0.1)
+  );
+  box-shadow:
+    0 0 28px rgba(92, 200, 255, 0.08),
+    0 0 64px rgba(168, 85, 247, 0.06);
+  animation:
+    float var(--d, 8s) ease-in-out infinite,
+    hue 7.5s linear infinite;
+}
+
+/* Quadrado pequeno */
+.neon-squares .square.small {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+/* Quadrado grande */
+.neon-squares .square.large {
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+}
+
+/* Variação azul */
+.neon-squares .square[data-color="blue"] {
+  background: linear-gradient(
+    135deg,
+    rgba(92, 200, 255, 0.16),
+    rgba(124, 140, 255, 0.04)
+  );
+  box-shadow: 0 0 34px rgba(92, 200, 255, 0.32);
+}
+
+/* Variação roxa */
+.neon-squares .square[data-color="purple"] {
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.18),
+    rgba(124, 140, 255, 0.04)
+  );
+  box-shadow: 0 0 38px rgba(168, 85, 247, 0.3);
+}
+
+/* Variação rosa */
+.neon-squares .square[data-color="pink"] {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 77, 109, 0.18),
+    rgba(124, 140, 255, 0.03)
+  );
+  box-shadow: 0 0 38px rgba(255, 77, 109, 0.28);
+}
+
+/* Animação de flutuação dos quadrados */
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateY(-36px) rotate(6deg);
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.6;
+  }
+}
+
+/* Animação de variação de cor */
+@keyframes hue {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+
+  50% {
+    filter: hue-rotate(30deg);
+  }
+
+  100% {
+    filter: hue-rotate(0deg);
+  }
+}
+
+/* Garante que o conteúdo fique acima do fundo animado */
+header,
+main,
+footer {
+  position: relative;
+  z-index: 1;
 }
 
 /* Container central reutilizável */
@@ -265,6 +393,43 @@ body::before {
   font-size: 1.65rem;
 }
 
+/* Painel de contadores */
+.summary-panel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Cada card de contador */
+.summary-item {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+/* Texto pequeno do contador */
+.summary-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* Número do contador */
+.summary-item strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--accent-blue);
+  font-size: 2rem;
+  line-height: 1;
+}
+
 /* Card da legenda */
 .legend-card {
   display: flex;
@@ -323,6 +488,54 @@ body::before {
 .low {
   background: var(--low);
   box-shadow: 0 0 16px rgba(56, 217, 150, 0.45);
+}
+
+/* Painel de filtros */
+.filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+/* Botões dos filtros */
+.filter-button {
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Efeito hover dos filtros */
+.filter-button:hover {
+  transform: translateY(-2px);
+  color: var(--text);
+  border-color: var(--accent-blue);
+  background: rgba(124, 140, 255, 0.14);
+}
+
+/* Filtro ativo */
+.filter-button.active {
+  color: #050713;
+  border-color: var(--accent-blue);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent));
+  box-shadow: 0 0 24px rgba(124, 140, 255, 0.24);
 }
 
 /* Layout principal: semana + lateral */
@@ -499,6 +712,54 @@ body::before {
   background: rgba(255, 255, 255, 0.035);
   font-size: 0.85rem;
   text-align: center;
+}
+
+/* Área dos botões dentro dos cards criados pelo JavaScript */
+.task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Botões internos dos cards */
+.task-actions button {
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Efeito ao passar o mouse nos botões dos cards */
+.task-actions button:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+  color: var(--text);
+  background: rgba(124, 140, 255, 0.16);
+}
+
+/* Visual do card quando o registro estiver concluído */
+.task-card-completed {
+  opacity: 0.68;
+}
+
+/* Risca o título do card concluído */
+.task-card-completed h4 {
+  text-decoration: line-through;
+}
+
+/* Muda a cor da etiqueta do card concluído */
+.task-card-completed small {
+  color: var(--low);
 }
 
 /* Coluna lateral */
@@ -741,6 +1002,19 @@ textarea {
   box-shadow: none;
 }
 
+/* Botão de cancelar edição */
+#botaoCancelarEdicao {
+  color: var(--muted-strong);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: none;
+}
+
+/* Classe utilitária para esconder elementos */
+.hidden {
+  display: none;
+}
+
 /* Mensagem abaixo do formulário */
 .form-message {
   grid-column: 1 / -1;
@@ -836,6 +1110,13 @@ textarea {
   }
 }
 
+/* Responsividade do painel de contadores */
+@media (max-width: 800px) {
+  .summary-panel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* Ajuste para celulares */
 @media (max-width: 640px) {
   .header-content {
@@ -867,194 +1148,6 @@ textarea {
 
   .form-actions button {
     width: 100%;
-  }
-}
-
-/* Área dos botões dentro dos cards criados pelo JavaScript */
-.task-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-/* Botões internos dos cards */
-.task-actions button {
-  padding: 8px 10px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  color: var(--muted-strong);
-  background: rgba(255, 255, 255, 0.07);
-  font-size: 0.78rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-/* Efeito ao passar o mouse nos botões dos cards */
-.task-actions button:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-blue);
-  color: var(--text);
-  background: rgba(124, 140, 255, 0.16);
-}
-
-/* Visual do card quando o registro estiver concluído */
-.task-card-completed {
-  opacity: 0.68;
-}
-
-/* Risca o título do card concluído */
-.task-card-completed h4 {
-  text-decoration: line-through;
-}
-
-/* Muda a cor da etiqueta do card concluído */
-.task-card-completed small {
-  color: var(--low);
-}
-
-/* Área dos botões dentro dos cards criados pelo JavaScript */
-.task-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-/* Botões internos dos cards */
-.task-actions button {
-  padding: 8px 10px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  color: var(--muted-strong);
-  background: rgba(255, 255, 255, 0.07);
-  font-size: 0.78rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-/* Efeito ao passar o mouse nos botões dos cards */
-.task-actions button:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-blue);
-  color: var(--text);
-  background: rgba(124, 140, 255, 0.16);
-}
-
-/* Visual do card quando o registro estiver concluído */
-.task-card-completed {
-  opacity: 0.68;
-}
-
-/* Risca o título do card concluído */
-.task-card-completed h4 {
-  text-decoration: line-through;
-}
-
-/* Muda a cor da etiqueta do card concluído */
-.task-card-completed small {
-  color: var(--low);
-}
-
-/* Painel de contadores */
-.summary-panel {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-/* Cada card de contador */
-.summary-item {
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(18px);
-}
-
-/* Texto pequeno do contador */
-.summary-item span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-}
-
-/* Número do contador */
-.summary-item strong {
-  display: block;
-  margin-top: 6px;
-  color: var(--accent-blue);
-  font-size: 2rem;
-  line-height: 1;
-}
-
-/* Painel de filtros */
-.filter-panel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(18px);
-}
-
-/* Botões dos filtros */
-.filter-button {
-  padding: 10px 14px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  color: var(--muted-strong);
-  background: rgba(255, 255, 255, 0.06);
-  font-size: 0.82rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-/* Efeito hover dos filtros */
-.filter-button:hover {
-  transform: translateY(-2px);
-  color: var(--text);
-  border-color: var(--accent-blue);
-  background: rgba(124, 140, 255, 0.14);
-}
-
-/* Filtro ativo */
-.filter-button.active {
-  color: #050713;
-  border-color: var(--accent-blue);
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent));
-  box-shadow: 0 0 24px rgba(124, 140, 255, 0.24);
-}
-
-/* Responsividade do painel de contadores */
-@media (max-width: 800px) {
-  .summary-panel {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 
