@@ -31,6 +31,23 @@
       <span class="square small" data-color="pink" style="left: 78%; top: 50%; --d: 6.6s"></span>
     </div>
 
+    <!-- Plaquinha flutuante do checklist
+      Ela só aparece quando existe pelo menos um lembrete ativo.
+      A função dela é sinalizar de forma discreta, sem poluir o cabeçalho.
+    -->
+    <button
+      id="atalhoLembreteAtivo"
+      class="reminder-signal hidden"
+      type="button"
+      data-acao="ir-lembretes"
+      aria-label="Existe lembrete ativo. Ir para o checklist."
+      title="Lembrete ativo"
+    >
+      <span class="reminder-triangle" aria-hidden="true">
+        <span>!</span>
+      </span>
+    </button>
+
     <!-- Cabeçalho principal da página -->
     <header class="app-header">
       <div class="container header-content">
@@ -44,6 +61,7 @@
           <a href="#semana">Semana</a>
           <a href="#novo-registro">Novo registro</a>
           <a href="#anotacoes">Anotações</a>
+          <a href="#lembretes">Lembretes</a>
         </nav>
       </div>
     </header>
@@ -74,70 +92,46 @@
         </div>
       </section>
 
-      <!-- Painel de contadores -->
-      <section class="summary-panel" aria-label="Resumo dos registros">
-        <article class="summary-item">
-          <span>Total</span>
-          <strong id="contadorTotal">0</strong>
-        </article>
-
-        <article class="summary-item">
-          <span>Pendentes</span>
-          <strong id="contadorPendentes">0</strong>
-        </article>
-
-        <article class="summary-item">
-          <span>Concluídos</span>
-          <strong id="contadorConcluidos">0</strong>
-        </article>
-
-        <article class="summary-item">
-          <span>Urgentes</span>
-          <strong id="contadorUrgentes">0</strong>
-        </article>
-      </section>
-
-      <!-- Filtros dos registros
-        Agora os próprios filtros também funcionam como legenda visual.
-        Assim evitamos repetir Urgente/Média/Baixa em dois lugares diferentes.
+      <!-- Resumo + filtros dos registros
+        Agora os números e os filtros ficam juntos.
+        Cada card mostra a quantidade e também funciona como botão de filtro.
       -->
-      <section class="filter-panel" aria-label="Filtros de registros">
-        <div class="filter-info">
-          <span>Filtros rápidos</span>
-          <p>Escolha uma visão por status ou importância.</p>
-        </div>
+      <section class="filter-summary-panel" aria-label="Resumo e filtros dos registros">
+        <button
+          class="filter-stat-card filter-stat-all active"
+          type="button"
+          data-filtro="todos"
+        >
+          <strong id="contadorTotal" class="filter-stat-number">0</strong>
+          <span class="filter-stat-label">Todos</span>
+        </button>
 
-        <div class="filter-actions">
-          <button class="filter-button active" type="button" data-filtro="todos">
-            <span class="filter-dot all"></span>
-            Todos
-          </button>
+        <button
+          class="filter-stat-card filter-stat-pending"
+          type="button"
+          data-filtro="pendentes"
+        >
+          <strong id="contadorPendentes" class="filter-stat-number">0</strong>
+          <span class="filter-stat-label">Pendentes</span>
+        </button>
 
-          <button class="filter-button" type="button" data-filtro="pendentes">
-            <span class="filter-dot pending"></span>
-            Pendentes
-          </button>
+        <button
+          class="filter-stat-card filter-stat-done"
+          type="button"
+          data-filtro="concluidos"
+        >
+          <strong id="contadorConcluidos" class="filter-stat-number">0</strong>
+          <span class="filter-stat-label">Concluídos</span>
+        </button>
 
-          <button class="filter-button" type="button" data-filtro="concluidos">
-            <span class="filter-dot done"></span>
-            Concluídos
-          </button>
-
-          <button class="filter-button" type="button" data-filtro="urgentes">
-            <span class="filter-dot urgent"></span>
-            Urgentes
-          </button>
-
-          <button class="filter-button" type="button" data-filtro="media">
-            <span class="filter-dot medium"></span>
-            Média
-          </button>
-
-          <button class="filter-button" type="button" data-filtro="baixa">
-            <span class="filter-dot low"></span>
-            Baixa
-          </button>
-        </div>
+        <button
+          class="filter-stat-card filter-stat-urgent"
+          type="button"
+          data-filtro="urgentes"
+        >
+          <strong id="contadorUrgentes" class="filter-stat-number">0</strong>
+          <span class="filter-stat-label">Urgentes</span>
+        </button>
       </section>
 
       <!-- Navegação semanal para celular
@@ -405,17 +399,36 @@
           </div>
         </article>
 
-        <!-- Bloco de lembretes -->
-        <article class="remember-card">
+        <!-- Bloco de lembretes rápidos
+          Esta área funciona como um checklist simples.
+          Adicionou um lembrete: a plaquinha aparece.
+          Deu check: o lembrete some e a plaquinha é atualizada automaticamente.
+        -->
+        <article id="lembretes" class="remember-card">
           <span class="side-kicker">Lembretes</span>
-          <h3>Não esquecer</h3>
+          <h3>Checklist rápido</h3>
 
-          <ul>
-            <li>Revisar matérias difíceis</li>
-            <li>Separar dúvidas</li>
-            <li>Conferir datas de prova</li>
-            <li>Atualizar planner semanal</li>
-          </ul>
+          <form id="lembreteForm" class="remember-form" autocomplete="off">
+            <label class="sr-only" for="textoLembrete">Novo lembrete</label>
+
+            <div class="remember-form-row">
+              <input
+                type="text"
+                id="textoLembrete"
+                name="textoLembrete"
+                placeholder="Digite um lembrete rápido"
+                required
+              />
+
+              <button type="submit" aria-label="Adicionar lembrete">+</button>
+            </div>
+          </form>
+
+          <p id="mensagemLembrete" class="remember-message">
+            Nenhum lembrete ativo.
+          </p>
+
+          <ul id="listaLembretes" class="remember-list"></ul>
         </article>
       </section>
     </main>

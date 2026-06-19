@@ -1,8 +1,12 @@
 "use strict";
 
-// Chave fixa usada para salvar e buscar os dados no localStorage.
-// Pense nela como o nome da gaveta onde guardamos os registros.
+// Chave fixa usada para salvar e buscar os registros principais no localStorage.
+// Pense nela como o nome da gaveta onde guardamos os registros da semana.
 const STORAGE_KEY = "study-tasks-registros";
+
+// Chave fixa usada para salvar e buscar os lembretes no localStorage.
+// Criamos outra gaveta para não misturar registros da semana com lembretes rápidos.
+const LEMBRETES_STORAGE_KEY = "study-tasks-lembretes";
 
 // Busca no HTML o elemento onde será exibido o mês atual.
 const mesAtual = document.getElementById("mesAtual");
@@ -19,6 +23,18 @@ const cardFormulario = document.querySelector(".form-card");
 
 // Busca a mensagem que aparece abaixo do formulário.
 const mensagemStatus = document.getElementById("mensagemStatus");
+
+// Busca os elementos do CRUD de lembretes.
+const formularioLembrete = document.getElementById("lembreteForm");
+const inputTextoLembrete = document.getElementById("textoLembrete");
+const listaLembretes = document.getElementById("listaLembretes");
+const mensagemLembrete = document.getElementById("mensagemLembrete");
+
+// Busca a plaquinha flutuante que sinaliza quando existe lembrete ativo.
+const atalhoLembreteAtivo = document.getElementById("atalhoLembreteAtivo");
+
+// Busca o card de lembretes para poder rolar até ele ao clicar na plaquinha.
+const cardLembretes = document.getElementById("lembretes");
 
 // Busca os botões do formulário.
 const botaoSubmit = document.getElementById("botaoSubmit");
@@ -220,6 +236,35 @@ function salvarRegistrosNoLocalStorage() {
 // Array principal do projeto.
 // Ele inicia com os dados salvos no navegador.
 let registros = carregarRegistrosDoLocalStorage();
+
+// Busca os lembretes salvos no localStorage.
+// Se não existir nada salvo, retorna array vazio.
+function carregarLembretesDoLocalStorage() {
+  const lembretesSalvos = localStorage.getItem(LEMBRETES_STORAGE_KEY);
+
+  if (!lembretesSalvos) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(lembretesSalvos);
+  } catch (erro) {
+    console.error("Erro ao carregar lembretes do localStorage:", erro);
+    localStorage.removeItem(LEMBRETES_STORAGE_KEY);
+    return [];
+  }
+}
+
+// Salva o array lembretes no localStorage.
+// É o mesmo conceito usado nos registros: array vira texto JSON.
+function salvarLembretesNoLocalStorage() {
+  const lembretesEmTexto = JSON.stringify(lembretes);
+  localStorage.setItem(LEMBRETES_STORAGE_KEY, lembretesEmTexto);
+}
+
+// Array separado para os lembretes rápidos.
+// Assim praticamos outro CRUD sem misturar com os registros da semana.
+let lembretes = carregarLembretesDoLocalStorage();
 
 // Função simples para evitar que textos digitados pelo usuário sejam interpretados como HTML.
 function escaparHTML(texto) {
@@ -587,6 +632,158 @@ function excluirRegistro(idRegistro) {
   console.log("Registro excluído. Array atual:", registros);
 }
 
+
+// Atualiza a plaquinha flutuante dos lembretes.
+// Regra simples: se existir lembrete no array, mostra; se não existir, esconde.
+function atualizarPlaquinhaLembrete() {
+  if (!atalhoLembreteAtivo) {
+    return;
+  }
+
+  if (lembretes.length > 0) {
+    atalhoLembreteAtivo.classList.remove("hidden");
+  } else {
+    atalhoLembreteAtivo.classList.add("hidden");
+  }
+}
+
+// Rola a tela até o checklist de lembretes.
+// Essa função é usada quando a pessoa clica na plaquinha flutuante.
+function rolarAteLembretes() {
+  if (!cardLembretes) {
+    return;
+  }
+
+  cardLembretes.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+
+  // Destaque rápido para o usuário entender onde a tela parou.
+  cardLembretes.classList.add("remember-card-focus");
+
+  setTimeout(function () {
+    cardLembretes.classList.remove("remember-card-focus");
+  }, 1200);
+
+  if (inputTextoLembrete) {
+    inputTextoLembrete.focus({ preventScroll: true });
+  }
+}
+
+// Cria o HTML exibido quando não existe nenhum lembrete cadastrado.
+function criarMensagemVaziaDeLembretes() {
+  return `
+    <li class="remember-empty">
+      Nenhum lembrete ativo.
+    </li>
+  `;
+}
+
+// Cria o HTML de um item de lembrete.
+// Agora o item possui apenas um botão de check.
+// Ao dar check, o lembrete é removido automaticamente do array.
+function criarItemLembrete(lembrete) {
+  const textoSeguro = escaparHTML(lembrete.texto);
+
+  return `
+    <li class="remember-item">
+      <span class="remember-item-text">${textoSeguro}</span>
+
+      <button
+        class="remember-check-button"
+        type="button"
+        data-acao="check-lembrete"
+        data-id="${lembrete.id}"
+        aria-label="Marcar lembrete como feito"
+        title="Marcar como feito"
+      >
+        ✓
+      </button>
+    </li>
+  `;
+}
+
+// Renderiza todos os lembretes na tela.
+// Renderizar é redesenhar a interface com base no array atual.
+function renderizarLembretes() {
+  if (!listaLembretes) {
+    atualizarPlaquinhaLembrete();
+    return;
+  }
+
+  if (lembretes.length === 0) {
+    listaLembretes.innerHTML = criarMensagemVaziaDeLembretes();
+
+    if (mensagemLembrete) {
+      mensagemLembrete.textContent = "Nenhum lembrete ativo.";
+    }
+
+    atualizarPlaquinhaLembrete();
+    return;
+  }
+
+  listaLembretes.innerHTML = "";
+
+  lembretes.forEach(function (lembrete) {
+    listaLembretes.innerHTML += criarItemLembrete(lembrete);
+  });
+
+  if (mensagemLembrete) {
+    mensagemLembrete.textContent = `${lembretes.length} lembrete(s) ativo(s).`;
+  }
+
+  atualizarPlaquinhaLembrete();
+}
+
+// Cria um objeto de lembrete usando o texto digitado no formulário.
+function criarLembretePeloFormulario() {
+  return {
+    id: Date.now(),
+    texto: inputTextoLembrete.value.trim(),
+    criadoEm: new Date().toISOString(),
+  };
+}
+
+// Adiciona um novo lembrete no array, salva e renderiza novamente.
+function adicionarLembrete() {
+  const novoLembrete = criarLembretePeloFormulario();
+
+  lembretes.push(novoLembrete);
+
+  salvarLembretesNoLocalStorage();
+  renderizarLembretes();
+
+  // Depois de adicionar, limpamos o campo para ficar rápido cadastrar outro.
+  if (formularioLembrete) {
+    formularioLembrete.reset();
+  }
+
+  if (mensagemLembrete) {
+    mensagemLembrete.textContent = "Lembrete adicionado.";
+  }
+
+  console.log("Lembretes atualizados:", lembretes);
+}
+
+// Marca o lembrete como feito.
+// Em vez de manter botão de excluir, o check já remove o lembrete da lista.
+// Isso deixa o uso mais rápido: escreveu, apareceu, fez, marcou, sumiu.
+function marcarCheckLembrete(idLembrete) {
+  lembretes = lembretes.filter(function (lembrete) {
+    return lembrete.id !== idLembrete;
+  });
+
+  salvarLembretesNoLocalStorage();
+  renderizarLembretes();
+
+  if (mensagemLembrete) {
+    mensagemLembrete.textContent = "Check feito. Lembrete removido da lista.";
+  }
+
+  console.log("Lembrete marcado como feito. Array atual:", lembretes);
+}
+
 // Evento de cadastro/edição do formulário.
 if (formularioRegistro) {
   formularioRegistro.addEventListener("submit", function (evento) {
@@ -626,6 +823,23 @@ if (botaoCancelarEdicao) {
   });
 }
 
+// Evento de cadastro dos lembretes rápidos.
+if (formularioLembrete) {
+  formularioLembrete.addEventListener("submit", function (evento) {
+    evento.preventDefault();
+
+    if (!inputTextoLembrete.value.trim()) {
+      if (mensagemLembrete) {
+        mensagemLembrete.textContent = "Digite um lembrete antes de adicionar.";
+      }
+
+      return;
+    }
+
+    adicionarLembrete();
+  });
+}
+
 // Captura cliques nos botões criados dinamicamente.
 document.addEventListener("click", function (evento) {
   const botaoClicado = evento.target.closest("button");
@@ -652,7 +866,17 @@ document.addEventListener("click", function (evento) {
     return;
   }
 
+  if (acao === "ir-lembretes") {
+    rolarAteLembretes();
+    return;
+  }
+
   const idRegistro = Number(botaoClicado.dataset.id);
+
+  if (acao === "check-lembrete") {
+    marcarCheckLembrete(idRegistro);
+    return;
+  }
 
   if (acao === "editar") {
     preencherFormularioParaEdicao(idRegistro);
@@ -674,7 +898,11 @@ botoesFiltro.forEach(function (botao) {
 
     renderizarRegistros();
 
-    mensagemStatus.textContent = `Filtro aplicado: ${botao.textContent.trim()}.`;
+    const nomeDoFiltro = botao.querySelector(".filter-stat-label")
+      ? botao.querySelector(".filter-stat-label").textContent.trim()
+      : botao.textContent.trim();
+
+    mensagemStatus.textContent = `Filtro aplicado: ${nomeDoFiltro}.`;
 
     console.log("Filtro atual:", filtroAtual);
   });
@@ -686,8 +914,12 @@ marcarDiaAtualNaSemana();
 // Renderiza o estado inicial da tela.
 renderizarRegistros();
 
+// Renderiza os lembretes salvos no navegador.
+renderizarLembretes();
+
 console.log("Study Tasks carregado com CRUD completo.");
 console.log("Registros carregados:", registros);
+console.log("Lembretes carregados:", lembretes);
 
 /* ===== Starfield + Meteors animation (canvas) ===== */
 (function () {
