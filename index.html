@@ -31,21 +31,18 @@
       <span class="square small" data-color="pink" style="left: 78%; top: 50%; --d: 6.6s"></span>
     </div>
 
-    <!-- Plaquinha flutuante do checklist
-      Ela só aparece quando existe pelo menos um lembrete ativo.
-      A função dela é sinalizar de forma discreta, sem poluir o cabeçalho.
+    <!-- Plaquinha flutuante: aparece somente quando existe lembrete ativo.
+      Ela é pequena de propósito para sinalizar sem poluir o cabeçalho.
     -->
     <button
       id="atalhoLembreteAtivo"
-      class="reminder-signal hidden"
+      class="reminder-float hidden"
       type="button"
       data-acao="ir-lembretes"
-      aria-label="Existe lembrete ativo. Ir para o checklist."
-      title="Lembrete ativo"
+      aria-label="Existe lembrete ativo. Ir para checklist rápido."
+      title="Ir para checklist rápido"
     >
-      <span class="reminder-triangle" aria-hidden="true">
-        <span>!</span>
-      </span>
+      ⚠
     </button>
 
     <!-- Cabeçalho principal da página -->
@@ -61,7 +58,6 @@
           <a href="#semana">Semana</a>
           <a href="#novo-registro">Novo registro</a>
           <a href="#anotacoes">Anotações</a>
-          <a href="#lembretes">Lembretes</a>
         </nav>
       </div>
     </header>
@@ -79,10 +75,15 @@
           </p>
         </div>
 
-        <div class="date-panel">
+        <div class="date-panel" id="painelDataCalendario">
           <article>
             <span>Mês</span>
             <strong id="mesAtual">---</strong>
+          </article>
+
+          <article class="date-day-card" data-date-card="dia">
+            <span>Dia</span>
+            <strong id="diaAtualCalendario">Hoje</strong>
           </article>
 
           <article>
@@ -133,55 +134,6 @@
           <span class="filter-stat-label">Urgentes</span>
         </button>
       </section>
-
-      <!-- Navegação semanal para celular
-        No desktop ela fica escondida pelo CSS.
-        No celular, funciona como um mini calendário: toca no dia e a página rola até ele.
-      -->
-      <section class="mobile-week-nav" aria-label="Navegação rápida pelos dias da semana">
-        <div class="mobile-week-nav-title">
-          <span>Semana</span>
-          <p>Toque em um dia para centralizar a semana.</p>
-        </div>
-
-        <div class="mobile-day-tabs">
-          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="segunda">
-            <span>Seg</span>
-            <strong>Segunda</strong>
-          </button>
-
-          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="terca">
-            <span>Ter</span>
-            <strong>Terça</strong>
-          </button>
-
-          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="quarta">
-            <span>Qua</span>
-            <strong>Quarta</strong>
-          </button>
-
-          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="quinta">
-            <span>Qui</span>
-            <strong>Quinta</strong>
-          </button>
-
-          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="sexta">
-            <span>Sex</span>
-            <strong>Sexta</strong>
-          </button>
-
-          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="sabado">
-            <span>Sáb</span>
-            <strong>Sábado</strong>
-          </button>
-
-          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="domingo">
-            <span>Dom</span>
-            <strong>Domingo</strong>
-          </button>
-        </div>
-      </section>
-
       <!-- Layout principal da semana -->
       <section id="semana" class="planner-layout">
         <!-- Quadro principal com todos os dias da semana.
@@ -189,7 +141,7 @@
           No celular, o CSS transforma esta área em um carrossel horizontal.
         -->
         <div class="week-board">
-          <div class="week-grid" aria-label="Carrossel semanal de registros">
+          <div class="week-grid" data-carrossel-semana aria-label="Carrossel semanal de registros">
             <article id="dia-segunda" class="day-column scroll-target" data-dia-coluna="segunda">
               <header>
                 <div>
@@ -384,54 +336,117 @@
           </form>
         </article>
 
-        <!-- Bloco de anotações -->
-        <article id="anotacoes" class="notes-card">
-          <span class="side-kicker">Anotações</span>
-          <h3>Notas para esta ou próxima semana</h3>
-
-          <div class="note-lines">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </article>
-
-        <!-- Bloco de lembretes rápidos
-          Esta área funciona como um checklist simples.
-          Adicionou um lembrete: a plaquinha aparece.
-          Deu check: o lembrete some e a plaquinha é atualizada automaticamente.
-        -->
+        <!-- Bloco de lembretes rápidos -->
         <article id="lembretes" class="remember-card">
           <span class="side-kicker">Lembretes</span>
           <h3>Checklist rápido</h3>
 
-          <form id="lembreteForm" class="remember-form" autocomplete="off">
-            <label class="sr-only" for="textoLembrete">Novo lembrete</label>
+          <form id="lembreteForm" class="remember-form">
+            <label for="textoLembrete">Novo lembrete</label>
 
-            <div class="remember-form-row">
+            <div class="remember-input-row">
               <input
                 type="text"
                 id="textoLembrete"
                 name="textoLembrete"
-                placeholder="Digite um lembrete rápido"
-                required
+                placeholder="Ex: revisar matéria difícil"
+                autocomplete="off"
               />
 
-              <button type="submit" aria-label="Adicionar lembrete">+</button>
+              <button type="submit" aria-label="Adicionar lembrete" title="Adicionar lembrete">
+                +
+              </button>
             </div>
           </form>
 
-          <p id="mensagemLembrete" class="remember-message">
-            Nenhum lembrete ativo.
+          <ul id="listaLembretes" class="remember-list"></ul>
+
+          <!-- Lista separada para lembretes pausados pelo botão de relógio.
+            Eles ficam guardados para voltar no próximo dia às 05:00.
+          -->
+          <div class="remember-scheduled-area">
+            <div class="remember-scheduled-title">
+              <span>Agendados</span>
+              <strong id="contadorLembretesAgendados">0</strong>
+            </div>
+
+            <ul id="listaLembretesAgendados" class="remember-scheduled-list"></ul>
+          </div>
+
+          <p id="mensagemLembrete" class="remember-message">Nenhum lembrete ativo.</p>
+        </article>
+
+        <!-- Anotações rápidas agora concentram o mini-paint -->
+        <article id="anotacoes" class="notes-card paint-notes-card">
+          <span class="side-kicker">Anotações rápidas</span>
+          <h3>Mini-paint de ideias</h3>
+          <p>
+            Use como um rascunho rápido. Desenhe no quadro, salve com a câmera
+            e veja os prints salvos logo abaixo.
           </p>
 
-          <ul id="listaLembretes" class="remember-list"></ul>
+          <div class="paint-board-wrap">
+            <canvas
+              id="paintCanvas"
+              class="paint-canvas"
+              aria-label="Quadro branco para desenho livre"
+            ></canvas>
+          </div>
+
+          <div class="paint-actions" aria-label="Ações do mini-paint">
+            <button
+              id="botaoSalvarPrintPaint"
+              class="paint-action-button paint-save-button"
+              type="button"
+              aria-label="Salvar print do desenho"
+              title="Salvar print do desenho"
+            >
+              📷
+            </button>
+
+            <button
+              id="botaoLimparPaint"
+              class="paint-action-button paint-clear-button"
+              type="button"
+              aria-label="Limpar quadro"
+              title="Limpar quadro"
+            >
+              X
+            </button>
+          </div>
+
+          <p id="mensagemPaint" class="paint-message">
+            Quadro pronto para desenhar.
+          </p>
+
+          <div class="paint-gallery-area">
+            <div class="paint-gallery-title">
+              <span>Prints salvos</span>
+              <strong id="contadorPrintsPaint">0</strong>
+            </div>
+
+            <div id="galeriaPrintsPaint" class="paint-gallery"></div>
+          </div>
         </article>
       </section>
     </main>
+
+    <!-- Modal simples para abrir o print do mini-paint em tamanho maior -->
+    <div id="paintModal" class="paint-modal hidden" aria-hidden="true">
+      <div class="paint-modal-content" role="dialog" aria-modal="true" aria-label="Visualização do print salvo">
+        <button
+          id="botaoFecharPaintModal"
+          class="paint-modal-close"
+          type="button"
+          aria-label="Fechar imagem"
+          title="Fechar imagem"
+        >
+          X
+        </button>
+
+        <img id="imagemPaintModal" src="" alt="Print ampliado do mini-paint" />
+      </div>
+    </div>
 
     <!-- Rodapé da página -->
     <footer class="app-footer">
