@@ -13,6 +13,10 @@ const anoAtual = document.getElementById("anoAtual");
 // Busca o formulário de cadastro pelo id.
 const formularioRegistro = document.getElementById("registroForm");
 
+// Busca o card visual onde o formulário está dentro.
+// Usaremos esse card para destacar quando o usuário estiver editando.
+const cardFormulario = document.querySelector(".form-card");
+
 // Busca a mensagem que aparece abaixo do formulário.
 const mensagemStatus = document.getElementById("mensagemStatus");
 
@@ -21,7 +25,16 @@ const botaoSubmit = document.getElementById("botaoSubmit");
 const botaoCancelarEdicao = document.getElementById("botaoCancelarEdicao");
 
 // Busca todos os elementos que possuem o atributo data-lista-dia.
+// Esses elementos são as listas onde os cards serão renderizados.
 const listasDosDias = document.querySelectorAll("[data-lista-dia]");
+
+// Busca todos os blocos que representam dias da semana.
+// O JavaScript usará essa lista para marcar automaticamente o dia atual.
+const colunasDosDias = document.querySelectorAll("[data-dia-coluna]");
+
+// Busca os botões do mini calendário mobile.
+// Eles usam data-dia-alvo para indicar para qual dia a página deve rolar.
+const botoesDiasMobile = document.querySelectorAll("[data-dia-alvo]");
 
 // Busca os botões de filtro.
 const botoesFiltro = document.querySelectorAll("[data-filtro]");
@@ -58,6 +71,21 @@ const nomesDosMeses = [
 // Cria um objeto Date com a data atual do sistema.
 const dataAtual = new Date();
 
+// Relaciona o número retornado pelo getDay() com o nome usado no nosso HTML.
+// No JavaScript: 0 = domingo, 1 = segunda, 2 = terça, e assim por diante.
+const diasDaSemanaPeloIndice = [
+  "domingo",
+  "segunda",
+  "terca",
+  "quarta",
+  "quinta",
+  "sexta",
+  "sabado",
+];
+
+// Guarda o dia atual usando o mesmo padrão dos data attributes do HTML.
+const diaAtualDaSemana = diasDaSemanaPeloIndice[dataAtual.getDay()];
+
 // Exibe o mês atual na tela, caso o elemento exista.
 if (mesAtual) {
   mesAtual.textContent = nomesDosMeses[dataAtual.getMonth()];
@@ -66,6 +94,102 @@ if (mesAtual) {
 // Exibe o ano atual na tela, caso o elemento exista.
 if (anoAtual) {
   anoAtual.textContent = dataAtual.getFullYear();
+}
+
+// Marca automaticamente o dia atual na semana.
+// Analogia: o HTML deixa uma "etiqueta" com data-dia-coluna,
+// e o JavaScript compara essa etiqueta com o dia real do calendário.
+function marcarDiaAtualNaSemana() {
+  colunasDosDias.forEach(function (coluna) {
+    const diaDaColuna = coluna.dataset.diaColuna;
+    const seloAntigo = coluna.querySelector(".today-badge");
+
+    // Remove selo antigo para evitar duplicação caso a função rode novamente.
+    if (seloAntigo) {
+      seloAntigo.remove();
+    }
+
+    // Se a coluna não representa o dia atual, garante que ela fique normal.
+    if (diaDaColuna !== diaAtualDaSemana) {
+      coluna.classList.remove("dia-atual");
+      return;
+    }
+
+    // Se chegou aqui, essa coluna é o dia atual.
+    coluna.classList.add("dia-atual");
+
+    // Cria o selo visual "Hoje" que aparece na ponta do card/coluna.
+    const seloHoje = document.createElement("span");
+    seloHoje.classList.add("today-badge");
+    seloHoje.textContent = "Hoje";
+    seloHoje.setAttribute("aria-label", "Dia atual da semana");
+
+    coluna.appendChild(seloHoje);
+  });
+
+  // Também marca o botão do mini calendário que representa o dia atual.
+  botoesDiasMobile.forEach(function (botao) {
+    if (botao.dataset.diaAlvo === diaAtualDaSemana) {
+      botao.classList.add("mobile-day-today");
+      botao.classList.add("mobile-day-selected");
+      botao.setAttribute("aria-label", botao.textContent.trim() + " - hoje");
+    } else {
+      botao.classList.remove("mobile-day-today");
+      botao.classList.remove("mobile-day-selected");
+      botao.removeAttribute("aria-label");
+    }
+  });
+}
+
+// Atualiza qual botão do mini calendário está selecionado.
+// Isso cria a sensação de carrossel: o dia escolhido ganha destaque no centro.
+function selecionarDiaNoMiniCalendario(diaAlvo) {
+  botoesDiasMobile.forEach(function (botao) {
+    if (botao.dataset.diaAlvo === diaAlvo) {
+      botao.classList.add("mobile-day-selected");
+
+      botao.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    } else {
+      botao.classList.remove("mobile-day-selected");
+    }
+  });
+}
+
+// Faz a rolagem suave até o bloco de um dia da semana.
+// Essa função é usada pelos botões do mini calendário mobile.
+function rolarAteDiaDaSemana(diaAlvo) {
+  const blocoDoDia = document.querySelector(`[data-dia-coluna="${diaAlvo}"]`);
+
+  // Se o dia não for encontrado, mostramos uma mensagem simples e paramos a função.
+  if (!blocoDoDia) {
+    mensagemStatus.textContent = "Não encontrei esse dia na semana.";
+    return;
+  }
+
+  // Primeiro destacamos o botão do mini calendário.
+  selecionarDiaNoMiniCalendario(diaAlvo);
+
+  // scrollIntoView é como dizer para o navegador:
+  // "leve a tela suavemente até esse bloco".
+  // No celular, inline: "center" também centraliza o card no carrossel horizontal.
+  blocoDoDia.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+    inline: "center",
+  });
+
+  // Aplica uma classe temporária para dar um pulso visual no dia escolhido.
+  blocoDoDia.classList.add("mobile-focus");
+
+  setTimeout(function () {
+    blocoDoDia.classList.remove("mobile-focus");
+  }, 1200);
+
+  mensagemStatus.textContent = `Dia selecionado: ${blocoDoDia.textContent.trim().split("\n")[0]}.`;
 }
 
 // Busca os registros salvos no localStorage.
@@ -121,7 +245,17 @@ function obterClasseImportancia(importancia) {
 }
 
 // Cria a mensagem exibida quando um dia não possui registros.
-function criarMensagemVazia() {
+// Sábado e domingo recebem uma mensagem diferente para representar descanso/folga.
+function criarMensagemVazia(diaDaLista) {
+  if (diaDaLista === "sabado" || diaDaLista === "domingo") {
+    return `
+      <div class="empty-message rest-message">
+        <strong>🌙 Dia livre</strong>
+        Sem tarefa cadastrada. Se precisar estudar, adicione um registro normalmente.
+      </div>
+    `;
+  }
+
   return '<div class="empty-message">Nenhum registro neste filtro.</div>';
 }
 
@@ -178,7 +312,7 @@ function renderizarMensagensVazias(registrosFiltrados) {
     });
 
     if (!existeRegistroNesseDia) {
-      lista.innerHTML = criarMensagemVazia();
+      lista.innerHTML = criarMensagemVazia(diaDaLista);
     }
   });
 }
@@ -187,7 +321,7 @@ function renderizarMensagensVazias(registrosFiltrados) {
 function criarCardRegistro(registro) {
   const classeImportancia = obterClasseImportancia(registro.importancia);
   const classeConcluido = registro.concluido ? "task-card-completed" : "";
-  const textoBotaoStatus = registro.concluido ? "Reabrir" : "Concluir";
+  const textoBotaoStatus = registro.concluido ? "🔄 Reabrir" : "✅ Concluir";
 
   const materiaSegura = escaparHTML(registro.materia);
   const tituloSeguro = escaparHTML(registro.titulo);
@@ -208,7 +342,7 @@ function criarCardRegistro(registro) {
 
       <div class="task-actions">
         <button type="button" data-acao="editar" data-id="${registro.id}">
-          Editar
+          ✏️ Editar
         </button>
 
         <button type="button" data-acao="alternar-status" data-id="${registro.id}">
@@ -216,7 +350,7 @@ function criarCardRegistro(registro) {
         </button>
 
         <button type="button" data-acao="excluir" data-id="${registro.id}">
-          Excluir
+          🗑️ Excluir
         </button>
       </div>
     </article>
@@ -330,7 +464,11 @@ function preencherFormularioParaEdicao(idRegistro) {
   idRegistroEmEdicao = idRegistro;
 
   if (botaoSubmit) {
-    botaoSubmit.textContent = "Salvar alteração";
+    botaoSubmit.textContent = "💾 Salvar alteração";
+  }
+
+  if (cardFormulario) {
+    cardFormulario.classList.add("editing-mode");
   }
 
   if (botaoCancelarEdicao) {
@@ -388,7 +526,11 @@ function cancelarModoEdicao() {
   }
 
   if (botaoSubmit) {
-    botaoSubmit.textContent = "Adicionar registro";
+    botaoSubmit.textContent = "➕ Adicionar registro";
+  }
+
+  if (cardFormulario) {
+    cardFormulario.classList.remove("editing-mode");
   }
 
   if (botaoCancelarEdicao) {
@@ -418,7 +560,17 @@ function alternarStatusRegistro(idRegistro) {
 }
 
 // Exclui um registro.
+// Antes de apagar, pedimos confirmação para evitar exclusão por clique errado.
 function excluirRegistro(idRegistro) {
+  const confirmouExclusao = confirm(
+    "Tem certeza que deseja excluir este registro? Essa ação não pode ser desfeita."
+  );
+
+  if (!confirmouExclusao) {
+    mensagemStatus.textContent = "Exclusão cancelada. Nenhum registro foi apagado.";
+    return;
+  }
+
   registros = registros.filter(function (registro) {
     return registro.id !== idRegistro;
   });
@@ -487,9 +639,16 @@ document.addEventListener("click", function (evento) {
 
   const acao = botaoClicado.dataset.acao;
 
-  // Se o botão não tiver data-acao, ele não pertence ao CRUD dos cards.
+  // Se o botão não tiver data-acao, ele não pertence às ações controladas por este listener.
   // Isso evita conflito com botões de filtro e botões do formulário.
   if (!acao) {
+    return;
+  }
+
+  // Ação especial dos botões do mini calendário mobile.
+  // Ela não usa id de registro, usa apenas o dia escolhido.
+  if (acao === "ir-dia") {
+    rolarAteDiaDaSemana(botaoClicado.dataset.diaAlvo);
     return;
   }
 
@@ -520,6 +679,9 @@ botoesFiltro.forEach(function (botao) {
     console.log("Filtro atual:", filtroAtual);
   });
 });
+
+// Marca o dia atual assim que a página carrega.
+marcarDiaAtualNaSemana();
 
 // Renderiza o estado inicial da tela.
 renderizarRegistros();
