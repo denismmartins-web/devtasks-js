@@ -430,46 +430,42 @@ footer {
   line-height: 1;
 }
 
-/* Card da legenda */
-.legend-card {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  padding: 14px 18px;
-  margin-bottom: 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(18px);
-}
-
-/* Cada item da legenda */
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted-strong);
-  font-size: 0.92rem;
-}
-
-/* Bolinhas de identificação */
-.dot,
+/* Identificadores visuais usados nos filtros e nos dias */
+.filter-dot,
 .day-dot {
   display: inline-block;
   border-radius: 50%;
 }
 
-/* Bolinha da legenda */
-.dot {
-  width: 13px;
-  height: 13px;
+/* Bolinha dos filtros */
+.filter-dot {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 11px;
 }
 
 /* Bolinha do dia */
 .day-dot {
   width: 11px;
   height: 11px;
+}
+
+/* Filtro geral */
+.all {
+  background: var(--accent-blue);
+  box-shadow: 0 0 16px rgba(92, 200, 255, 0.45);
+}
+
+/* Filtro de pendentes */
+.pending {
+  background: var(--medium);
+  box-shadow: 0 0 16px rgba(255, 209, 102, 0.45);
+}
+
+/* Filtro de concluídos */
+.done {
+  background: var(--low);
+  box-shadow: 0 0 16px rgba(56, 217, 150, 0.45);
 }
 
 /* Cor urgente */
@@ -490,11 +486,21 @@ footer {
   box-shadow: 0 0 16px rgba(56, 217, 150, 0.45);
 }
 
-/* Painel de filtros */
+/* Cor usada para descanso, folga ou planejamento do fim de semana */
+.rest {
+  background: var(--accent-purple);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.45);
+}
+
+/* Painel de filtros
+   Agora ele também faz o papel de legenda.
+   Em vez de ter uma legenda separada, cada botão mostra sua própria cor/estado.
+*/
 .filter-panel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
   margin-bottom: 16px;
   padding: 14px;
   border: 1px solid var(--line);
@@ -504,8 +510,41 @@ footer {
   backdrop-filter: blur(18px);
 }
 
+/* Texto curto que explica a função dos filtros */
+.filter-info {
+  min-width: 190px;
+}
+
+/* Título pequeno dos filtros */
+.filter-info span {
+  display: block;
+  color: var(--accent-blue);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* Descrição dos filtros */
+.filter-info p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+/* Agrupa os botões de filtro */
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 /* Botões dos filtros */
 .filter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 10px 14px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
@@ -538,10 +577,152 @@ footer {
   box-shadow: 0 0 24px rgba(124, 140, 255, 0.24);
 }
 
-/* Layout principal: semana + lateral */
+
+/* Mini calendário semanal usado principalmente no celular.
+   Ele fica escondido no desktop e aparece nas telas menores. */
+.mobile-week-nav {
+  display: none;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(16, 22, 42, 0.92);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+/* Texto do mini calendário */
+.mobile-week-nav-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Título pequeno da navegação semanal */
+.mobile-week-nav-title span {
+  color: var(--accent-blue);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* Explicação curta da navegação semanal */
+.mobile-week-nav-title p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+/* Lista horizontal dos dias no celular */
+.mobile-day-tabs {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Botão de cada dia no mini calendário */
+.mobile-day-button {
+  min-width: 82px;
+  scroll-snap-align: start;
+  padding: 10px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Abreviação do dia no botão mobile */
+.mobile-day-button span {
+  display: block;
+  color: var(--accent-blue);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+/* Nome completo do dia no botão mobile */
+.mobile-day-button strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted-strong);
+  font-size: 0.72rem;
+}
+
+/* Efeito de toque/hover no botão de dia */
+.mobile-day-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+  background: rgba(124, 140, 255, 0.14);
+  box-shadow: 0 0 22px rgba(92, 200, 255, 0.14);
+}
+
+/* Destaque do botão que representa o dia atual */
+.mobile-day-button.mobile-day-today {
+  color: #050713;
+  border-color: var(--accent-blue);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent));
+  box-shadow: 0 0 24px rgba(92, 200, 255, 0.24);
+}
+
+/* No botão do dia atual, o texto fica mais escuro para manter contraste */
+.mobile-day-button.mobile-day-today span,
+.mobile-day-button.mobile-day-today strong {
+  color: #050713;
+}
+
+/* Botão selecionado no carrossel mobile */
+.mobile-day-button.mobile-day-selected {
+  transform: translateY(-2px) scale(1.04);
+  border-color: var(--accent-blue);
+  box-shadow:
+    0 0 0 1px rgba(92, 200, 255, 0.18),
+    0 0 24px rgba(92, 200, 255, 0.18);
+}
+
+/* Classe temporária aplicada quando o usuário toca em um dia no mini calendário */
+.mobile-focus {
+  animation: mobileFocusPulse 1.1s ease;
+}
+
+/* Pulso visual para mostrar onde a rolagem parou */
+@keyframes mobileFocusPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(92, 200, 255, 0.45);
+  }
+
+  70% {
+    box-shadow: 0 0 0 12px rgba(92, 200, 255, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(92, 200, 255, 0);
+  }
+}
+
+/* Cada bloco de dia recebe uma margem de rolagem.
+   Assim, ao usar scrollIntoView, o conteúdo não cola no topo da tela. */
+.scroll-target {
+  scroll-margin-top: 18px;
+}
+
+/* Layout principal da semana.
+   Agora o quadro semanal ocupa a largura total para comportar os 7 dias. */
 .planner-layout {
   display: grid;
-  grid-template-columns: 1fr 310px;
+  grid-template-columns: 1fr;
   gap: 16px;
   align-items: stretch;
 }
@@ -556,10 +737,10 @@ footer {
   backdrop-filter: blur(18px);
 }
 
-/* Grade dos dias úteis */
+/* Grade dos dias da semana no desktop */
 .week-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   min-height: 410px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -575,6 +756,48 @@ footer {
   border-right: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.025);
 }
+
+/* Permite posicionar o selo "Hoje" na ponta da coluna */
+.day-column,
+.weekend-card {
+  position: relative;
+}
+
+/* Destaque automático aplicado pelo JavaScript no dia atual */
+.dia-atual {
+  border-color: rgba(92, 200, 255, 0.76);
+  background:
+    radial-gradient(circle at top right, rgba(92, 200, 255, 0.18), transparent 42%),
+    rgba(255, 255, 255, 0.045);
+  box-shadow:
+    0 0 0 1px rgba(92, 200, 255, 0.12),
+    0 0 34px rgba(92, 200, 255, 0.16);
+}
+
+/* Bolinha do dia atual fica azul para diferenciar das bolinhas comuns */
+.dia-atual .day-dot {
+  background: var(--accent-blue);
+  box-shadow: 0 0 18px rgba(92, 200, 255, 0.72);
+}
+
+/* Selo que aparece na ponta do dia atual */
+.today-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  padding: 5px 9px;
+  border: 1px solid rgba(92, 200, 255, 0.72);
+  border-radius: 999px;
+  color: #050713;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent));
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  box-shadow: 0 0 22px rgba(92, 200, 255, 0.28);
+}
+
 
 /* Remove borda do último dia */
 .day-column:last-child {
@@ -601,6 +824,28 @@ footer {
   font-size: 0.86rem;
   text-transform: uppercase;
   letter-spacing: 0.9px;
+}
+
+/* Etiqueta pequena usada no sábado e domingo */
+.weekend-label {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border: 1px solid rgba(168, 85, 247, 0.32);
+  border-radius: 999px;
+  color: var(--muted-strong);
+  background: rgba(168, 85, 247, 0.1);
+  font-size: 0.64rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Fim de semana recebe um tom diferente para representar descanso/planejamento */
+.day-column-weekend {
+  background:
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.12), transparent 42%),
+    rgba(255, 255, 255, 0.025);
 }
 
 /* Lista de tarefas dentro do dia */
@@ -712,6 +957,19 @@ footer {
   background: rgba(255, 255, 255, 0.035);
   font-size: 0.85rem;
   text-align: center;
+}
+
+/* Mensagem especial para sábado/domingo quando não há tarefa cadastrada */
+.rest-message {
+  border-color: rgba(168, 85, 247, 0.36);
+  color: var(--muted-strong);
+  background: rgba(168, 85, 247, 0.09);
+}
+
+.rest-message strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
 }
 
 /* Área dos botões dentro dos cards criados pelo JavaScript */
@@ -853,6 +1111,23 @@ footer {
 .form-card {
   padding: 22px;
 }
+
+/* Destaque visual quando o formulário está em modo de edição */
+.form-card.editing-mode {
+  border-color: rgba(255, 209, 102, 0.76);
+  background:
+    radial-gradient(circle at top right, rgba(255, 209, 102, 0.16), transparent 38%),
+    var(--surface);
+  box-shadow:
+    0 0 0 1px rgba(255, 209, 102, 0.12),
+    0 0 34px rgba(255, 209, 102, 0.16);
+}
+
+/* Troca a cor do pequeno título enquanto está editando */
+.form-card.editing-mode .section-title span {
+  color: var(--medium);
+}
+
 
 /* Título da seção do formulário */
 .section-title span {
@@ -1084,6 +1359,24 @@ textarea {
   font-size: 0.9rem;
 }
 
+
+
+/* Em telas menores, os filtros ficam em uma única coluna */
+@media (max-width: 760px) {
+  .filter-panel {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .filter-info {
+    min-width: 0;
+  }
+
+  .filter-actions {
+    justify-content: flex-start;
+  }
+}
+
 /* Ajuste para telas médias */
 @media (max-width: 1020px) {
   .planner-top,
@@ -1117,15 +1410,48 @@ textarea {
   }
 }
 
-/* Ajuste para celulares */
+/* Modelo mobile: o layout deixa de parecer uma dashboard grande
+   e passa a se comportar mais como um app com rolagem guiada. */
 @media (max-width: 640px) {
+  .container {
+    width: min(100% - 22px, var(--container));
+  }
+
+  .app-header {
+    padding: 22px 0 16px;
+  }
+
   .header-content {
     align-items: flex-start;
     flex-direction: column;
+    gap: 14px;
   }
 
   .app-header h1 {
+    font-size: clamp(2.45rem, 15vw, 4.2rem);
     letter-spacing: -1px;
+  }
+
+  .app-header p {
+    font-size: 0.92rem;
+  }
+
+  .header-nav {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .header-nav a {
+    flex: 0 0 auto;
+    font-size: 0.82rem;
+    padding: 10px 13px;
+  }
+
+  .planner-top {
+    margin-top: 8px;
   }
 
   .date-panel,
@@ -1139,21 +1465,488 @@ textarea {
   .form-card,
   .notes-card,
   .remember-card {
-    padding: 18px;
+    padding: 16px;
+    border-radius: 22px;
   }
 
-  .header-nav a {
-    font-size: 0.85rem;
+  .planner-title-card h2 {
+    font-size: clamp(1.55rem, 8vw, 2.35rem);
+  }
+
+  .planner-title-card p,
+  .section-title p {
+    font-size: 0.9rem;
+  }
+
+  /* No celular, os contadores viram uma faixa horizontal.
+     Isso evita quatro cards enormes um embaixo do outro. */
+  .summary-panel {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-bottom: 14px;
+    padding-bottom: 4px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .summary-item {
+    min-width: 138px;
+    flex: 0 0 138px;
+    padding: 14px;
+    scroll-snap-align: start;
+  }
+
+  .summary-item strong {
+    font-size: 1.65rem;
+  }
+
+  /* Os filtros também ficam horizontais, como chips de aplicativo. */
+  .filter-panel {
+    padding: 13px;
+    border-radius: 22px;
+  }
+
+  .filter-info p {
+    font-size: 0.8rem;
+  }
+
+  .filter-actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-button {
+    flex: 0 0 auto;
+    padding: 9px 12px;
+    font-size: 0.78rem;
+  }
+
+  /* Mostra o mini calendário semanal apenas no celular. */
+  .mobile-week-nav {
+    display: block;
+    position: sticky;
+    top: 8px;
+    z-index: 5;
+  }
+
+  .mobile-week-nav-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .mobile-week-nav-title p {
+    text-align: left;
+  }
+
+  /* O quadro da semana fica mais limpo no celular. */
+  .week-board {
+    padding: 10px;
+  }
+
+  .week-grid {
+    min-height: auto;
+    border: none;
+    gap: 12px;
+    overflow: visible;
+    background: transparent;
+  }
+
+  .day-column {
+    min-height: auto;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .day-column:last-child {
+    border: 1px solid var(--line);
+  }
+
+  .day-column header {
+    position: sticky;
+    top: 86px;
+    z-index: 2;
+    padding: 13px 12px;
+    background: rgba(16, 22, 42, 0.96);
+    backdrop-filter: blur(14px);
+  }
+
+  .day-column h3 {
+    font-size: 0.9rem;
+  }
+
+  .task-list {
+    gap: 9px;
+    padding: 11px;
+  }
+
+  .task-card {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .task-card h4 {
+    font-size: 1rem;
+  }
+
+  .task-card p {
+    font-size: 0.84rem;
+  }
+
+  .task-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .task-actions button {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+
+  .side-panel {
+    gap: 12px;
+  }
+
+  .weekend-card,
+  .todo-card {
+    border-radius: 20px;
+  }
+
+  .weekend-card {
+    padding: 16px;
+  }
+
+  .bottom-layout {
+    gap: 12px;
   }
 
   .form-actions button {
     width: 100%;
   }
+
+  .today-badge {
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-size: 0.62rem;
+  }
+
+  .scroll-target {
+    scroll-margin-top: 96px;
+  }
 }
 
-/* Responsividade dos contadores no celular */
+/* Ajuste fino para celulares bem estreitos */
 @media (max-width: 480px) {
-  .summary-panel {
+  .date-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .date-panel article {
+    min-height: 88px;
+    padding: 14px;
+  }
+
+  .date-panel strong {
+    font-size: 1.25rem;
+  }
+
+  .mobile-day-button {
+    min-width: 76px;
+    padding: 9px 10px;
+  }
+
+  .summary-item {
+    min-width: 126px;
+    flex-basis: 126px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 11px 12px;
+  }
+}
+
+
+/* ===== Refinamento mobile 393px / 430px =====
+   Este bloco funciona como um "modo celular" dentro do mesmo projeto.
+   O desktop mantém cara de dashboard; o celular ganha cara de app. */
+@media (max-width: 640px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: min(100% - 18px, var(--container));
+  }
+
+  .app-header {
+    padding: 16px 0 10px;
+  }
+
+  .app-header h1 {
+    font-size: clamp(2.1rem, 13vw, 3.45rem);
+  }
+
+  .app-header p {
+    font-size: 0.84rem;
+  }
+
+  .planner-top {
     grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 8px 0 10px;
+  }
+
+  .planner-title-card {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .planner-title-card h2 {
+    font-size: clamp(1.28rem, 6.2vw, 1.78rem);
+  }
+
+  .planner-title-card p {
+    margin-top: 8px;
+    font-size: 0.8rem;
+  }
+
+  /* Mês e ano ficam pequenos, lado a lado, sem rolagem lateral. */
+  .date-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .date-panel article {
+    min-height: 58px;
+    padding: 9px 11px;
+    border-radius: 15px;
+  }
+
+  .date-panel span {
+    font-size: 0.58rem;
+    letter-spacing: 0.9px;
+  }
+
+  .date-panel strong {
+    margin-top: 2px;
+    font-size: 1rem;
+  }
+
+  /* Os 4 contadores cabem juntos na tela do celular. */
+  .summary-panel {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    overflow: visible;
+    margin-bottom: 10px;
+    padding-bottom: 0;
+    scroll-snap-type: none;
+  }
+
+  .summary-item {
+    min-width: 0;
+    flex: initial;
+    padding: 8px 6px;
+    border-radius: 14px;
+    text-align: center;
+  }
+
+  .summary-item span {
+    font-size: 0.54rem;
+    letter-spacing: 0.35px;
+    white-space: nowrap;
+  }
+
+  .summary-item strong {
+    margin-top: 3px;
+    font-size: 1.08rem;
+  }
+
+  /* Filtros compactos: sem rolagem lateral e em grade de chips. */
+  .filter-panel {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 17px;
+  }
+
+  .filter-info {
+    min-width: 0;
+  }
+
+  .filter-info span {
+    font-size: 0.62rem;
+  }
+
+  .filter-info p {
+    display: none;
+  }
+
+  .filter-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .filter-button {
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+    padding: 8px 5px;
+    gap: 4px;
+    font-size: 0.64rem;
+    white-space: nowrap;
+  }
+
+  .filter-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  /* Mini calendário mais compacto, com sensação de app. */
+  .mobile-week-nav {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .mobile-week-nav-title {
+    margin-bottom: 8px;
+  }
+
+  .mobile-week-nav-title span {
+    font-size: 0.62rem;
+  }
+
+  .mobile-week-nav-title p {
+    font-size: 0.68rem;
+  }
+
+  .mobile-day-tabs {
+    gap: 8px;
+    padding: 3px 4px 7px;
+    scroll-padding-inline: 40%;
+  }
+
+  .mobile-day-button {
+    min-width: 72px;
+    padding: 8px 9px;
+    border-radius: 16px;
+    scroll-snap-align: center;
+  }
+
+  .mobile-day-button span {
+    font-size: 0.72rem;
+  }
+
+  .mobile-day-button strong {
+    font-size: 0.62rem;
+  }
+
+  /* O quadro semanal vira carrossel horizontal no celular. */
+  .week-board {
+    padding: 9px;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .week-grid {
+    display: flex;
+    grid-template-columns: none;
+    min-height: auto;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: visible;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 7%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .day-column {
+    flex: 0 0 86%;
+    min-height: 360px;
+    max-height: none;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    overflow: hidden;
+    scroll-snap-align: center;
+    box-shadow: var(--shadow-card);
+  }
+
+  .day-column:last-child {
+    border: 1px solid var(--line);
+  }
+
+  .day-column header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    min-height: 58px;
+    padding: 12px;
+    background: rgba(16, 22, 42, 0.97);
+  }
+
+  .day-column h3 {
+    font-size: 0.86rem;
+  }
+
+  .weekend-label {
+    margin-top: 6px;
+    font-size: 0.56rem;
+  }
+
+  .task-list {
+    padding: 11px;
+  }
+
+  .empty-message {
+    padding: 11px;
+    font-size: 0.78rem;
+  }
+
+  .side-panel {
+    margin-top: 12px;
+  }
+
+  .todo-card {
+    padding: 15px;
+  }
+
+  .scroll-target {
+    scroll-margin-top: 92px;
+  }
+}
+
+@media (max-width: 420px) {
+  .summary-item span {
+    font-size: 0.49rem;
+  }
+
+  .summary-item strong {
+    font-size: 1rem;
+  }
+
+  .filter-button {
+    font-size: 0.6rem;
+  }
+
+  .day-column {
+    flex-basis: 88%;
   }
 }
