@@ -8,11 +8,28 @@ const STORAGE_KEY = "study-tasks-registros";
 // Criamos outra gaveta para não misturar registros da semana com lembretes rápidos.
 const LEMBRETES_STORAGE_KEY = "study-tasks-lembretes";
 
+// Chave usada para salvar as anotações rápidas por dia.
+// Agora ela guarda um objeto, por exemplo: { segunda: "...", terca: "..." }.
+const ANOTACAO_STORAGE_KEY = "study-tasks-anotacoes-por-dia";
+
+// Chave antiga, usada antes quando existia apenas uma anotação geral.
+// Mantemos para migrar o texto antigo para o dia atual, sem perder conteúdo.
+const ANOTACAO_STORAGE_KEY_ANTIGA = "study-tasks-anotacao-rapida";
+
+// Chave usada para salvar o desenho do mini-paint como imagem em texto.
+const PAINT_STORAGE_KEY = "study-tasks-mini-paint";
+
+// Busca no HTML o painel onde ficam os cards de Mês, Dia e Ano.
+const painelDataCalendario = document.getElementById("painelDataCalendario") || document.querySelector(".date-panel");
+
 // Busca no HTML o elemento onde será exibido o mês atual.
 const mesAtual = document.getElementById("mesAtual");
 
 // Busca no HTML o elemento onde será exibido o ano atual.
 const anoAtual = document.getElementById("anoAtual");
+
+// Busca no HTML o elemento onde será exibido o dia atual do mês.
+let diaAtualCalendario = document.getElementById("diaAtualCalendario");
 
 // Busca o formulário de cadastro pelo id.
 const formularioRegistro = document.getElementById("registroForm");
@@ -28,6 +45,8 @@ const mensagemStatus = document.getElementById("mensagemStatus");
 const formularioLembrete = document.getElementById("lembreteForm");
 const inputTextoLembrete = document.getElementById("textoLembrete");
 const listaLembretes = document.getElementById("listaLembretes");
+const listaLembretesAgendados = document.getElementById("listaLembretesAgendados");
+const contadorLembretesAgendados = document.getElementById("contadorLembretesAgendados");
 const mensagemLembrete = document.getElementById("mensagemLembrete");
 
 // Busca a plaquinha flutuante que sinaliza quando existe lembrete ativo.
@@ -35,6 +54,11 @@ const atalhoLembreteAtivo = document.getElementById("atalhoLembreteAtivo");
 
 // Busca o card de lembretes para poder rolar até ele ao clicar na plaquinha.
 const cardLembretes = document.getElementById("lembretes");
+
+// Busca os elementos das anotações rápidas.
+const campoAnotacaoRapida = document.getElementById("anotacaoRapida");
+const mensagemAnotacao = document.getElementById("mensagemAnotacao");
+const diaAnotacaoTitulo = document.getElementById("diaAnotacaoTitulo");
 
 // Busca os botões do formulário.
 const botaoSubmit = document.getElementById("botaoSubmit");
@@ -51,6 +75,7 @@ const colunasDosDias = document.querySelectorAll("[data-dia-coluna]");
 // Busca os botões do mini calendário mobile.
 // Eles usam data-dia-alvo para indicar para qual dia a página deve rolar.
 const botoesDiasMobile = document.querySelectorAll("[data-dia-alvo]");
+const carrosselSemana = document.querySelector("[data-carrossel-semana]") || document.querySelector(".week-grid");
 
 // Busca os botões de filtro.
 const botoesFiltro = document.querySelectorAll("[data-filtro]");
@@ -68,6 +93,13 @@ let filtroAtual = "todos";
 // Quando for null, significa que estamos cadastrando um novo registro.
 let idRegistroEmEdicao = null;
 
+// Guarda o dia selecionado no bloco de anotações rápidas.
+// Ele começa em segunda só como valor temporário; depois será trocado para o dia atual.
+let diaAnotacaoSelecionado = "segunda";
+
+// Guarda as anotações por dia da semana.
+let anotacoesPorDia = {};
+
 // Cria uma lista com os nomes dos meses em português.
 const nomesDosMeses = [
   "Janeiro",
@@ -83,6 +115,38 @@ const nomesDosMeses = [
   "Novembro",
   "Dezembro",
 ];
+
+// Garante que o card "Dia" exista visualmente no HTML.
+// Esta proteção ajuda se, por engano, o card do dia não tiver sido copiado no index.html.
+function garantirCardDiaAtualNoHTML() {
+  // Se o elemento do dia já existe, não precisamos criar nada.
+  if (diaAtualCalendario || !painelDataCalendario) {
+    return;
+  }
+
+  // Cria o card visual do dia usando JavaScript.
+  // Analogia: se a gaveta "Dia" não existe no armário, o JS monta essa gaveta antes de guardar o valor.
+  const cardDia = document.createElement("article");
+  cardDia.classList.add("date-day-card");
+  cardDia.dataset.dateCard = "dia";
+
+  cardDia.innerHTML = `
+    <span>Dia</span>
+    <strong id="diaAtualCalendario">Hoje</strong>
+  `;
+
+  // Tenta colocar o card Dia antes do card Ano para ficar: Mês | Dia | Ano.
+  const cardAno = anoAtual ? anoAtual.closest("article") : null;
+
+  if (cardAno) {
+    painelDataCalendario.insertBefore(cardDia, cardAno);
+  } else {
+    painelDataCalendario.appendChild(cardDia);
+  }
+
+  // Atualiza a variável para apontar para o elemento recém-criado.
+  diaAtualCalendario = document.getElementById("diaAtualCalendario");
+}
 
 // Cria um objeto Date com a data atual do sistema.
 const dataAtual = new Date();
@@ -102,9 +166,32 @@ const diasDaSemanaPeloIndice = [
 // Guarda o dia atual usando o mesmo padrão dos data attributes do HTML.
 const diaAtualDaSemana = diasDaSemanaPeloIndice[dataAtual.getDay()];
 
+// A anotação também começa no dia atual.
+diaAnotacaoSelecionado = diaAtualDaSemana;
+
+// Nomes usados para exibir mensagens mais amigáveis.
+const nomesDosDias = {
+  domingo: "Domingo",
+  segunda: "Segunda",
+  terca: "Terça",
+  quarta: "Quarta",
+  quinta: "Quinta",
+  sexta: "Sexta",
+  sabado: "Sábado",
+};
+
+// Garante que o card visual do dia exista antes de preencher o valor.
+garantirCardDiaAtualNoHTML();
+
 // Exibe o mês atual na tela, caso o elemento exista.
 if (mesAtual) {
   mesAtual.textContent = nomesDosMeses[dataAtual.getMonth()];
+}
+
+// Exibe o dia atual do mês na tela, caso o elemento exista.
+if (diaAtualCalendario) {
+  diaAtualCalendario.textContent = String(dataAtual.getDate()).padStart(2, "0");
+  diaAtualCalendario.title = "Dia atual do mês";
 }
 
 // Exibe o ano atual na tela, caso o elemento exista.
@@ -163,16 +250,39 @@ function selecionarDiaNoMiniCalendario(diaAlvo) {
   botoesDiasMobile.forEach(function (botao) {
     if (botao.dataset.diaAlvo === diaAlvo) {
       botao.classList.add("mobile-day-selected");
-
-      botao.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
+      centralizarElementoNoCarrossel(carrosselDiasMobile, botao, "smooth");
     } else {
       botao.classList.remove("mobile-day-selected");
     }
   });
+}
+
+// Centraliza um elemento dentro de um carrossel horizontal.
+// Analogia: o carrossel é uma régua comprida, e esta função empurra a régua
+// até o item escolhido ficar no meio da tela.
+function centralizarElementoNoCarrossel(carrossel, elemento, comportamento) {
+  if (!carrossel || !elemento) {
+    return;
+  }
+
+  const posicaoCentral =
+    elemento.offsetLeft - (carrossel.clientWidth - elemento.clientWidth) / 2;
+
+  carrossel.scrollTo({
+    left: Math.max(0, posicaoCentral),
+    behavior: comportamento || "smooth",
+  });
+}
+
+// Centraliza o dia atual no carrossel principal da semana.
+// Essa é a correção importante: o foco visual deve ser o box real dos dias,
+// por exemplo: | Quinta | SEXTA | Sábado | com o dia atual no centro.
+function centralizarDiaAtualNosCarrosseis(comportamento) {
+  const blocoSemanaHoje = document.querySelector(
+    `[data-dia-coluna="${diaAtualDaSemana}"]`
+  );
+
+  centralizarElementoNoCarrossel(carrosselSemana, blocoSemanaHoje, comportamento || "auto");
 }
 
 // Faz a rolagem suave até o bloco de um dia da semana.
@@ -189,12 +299,15 @@ function rolarAteDiaDaSemana(diaAlvo) {
   // Primeiro destacamos o botão do mini calendário.
   selecionarDiaNoMiniCalendario(diaAlvo);
 
-  // scrollIntoView é como dizer para o navegador:
-  // "leve a tela suavemente até esse bloco".
-  // No celular, inline: "center" também centraliza o card no carrossel horizontal.
+  // Primeiro centralizamos o card dentro do carrossel horizontal.
+  // Isso é mais preciso no mobile do que depender apenas do scrollIntoView.
+  centralizarElementoNoCarrossel(carrosselSemana, blocoDoDia, "smooth");
+
+  // Depois levamos a tela até a área da semana.
+  // Assim o usuário não fica perdido caso esteja mais abaixo na página.
   blocoDoDia.scrollIntoView({
     behavior: "smooth",
-    block: "start",
+    block: "nearest",
     inline: "center",
   });
 
@@ -633,18 +746,95 @@ function excluirRegistro(idRegistro) {
 }
 
 
+// Calcula amanhã às 05:00.
+// Essa função é usada pelo botão de relógio do lembrete.
+function calcularProximoDiaAsCinco() {
+  const proximaAtivacao = new Date();
+
+  proximaAtivacao.setDate(proximaAtivacao.getDate() + 1);
+  proximaAtivacao.setHours(5, 0, 0, 0);
+
+  return proximaAtivacao.toISOString();
+}
+
+// Formata a data de retorno do lembrete agendado.
+// Mantemos curto para não poluir o card.
+function formatarHorarioAgendado(dataISO) {
+  const data = new Date(dataISO);
+
+  return data.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+// Verifica se um lembrete está ativo agora.
+// Sem pausadoAte = ativo.
+// Com pausadoAte no futuro = agendado/pausado.
+// Com pausadoAte já vencido = volta a ser ativo.
+function lembreteEstaAtivo(lembrete) {
+  if (!lembrete.pausadoAte) {
+    return true;
+  }
+
+  return new Date(lembrete.pausadoAte).getTime() <= Date.now();
+}
+
+// Limpa pausas vencidas.
+// Se já passou de 05:00, o lembrete volta a ficar ativo automaticamente quando o app abre/atualiza.
+function atualizarLembretesAgendados() {
+  let houveAtualizacao = false;
+
+  lembretes = lembretes.map(function (lembrete) {
+    if (lembrete.pausadoAte && lembreteEstaAtivo(lembrete)) {
+      houveAtualizacao = true;
+
+      return {
+        ...lembrete,
+        pausadoAte: null,
+      };
+    }
+
+    return lembrete;
+  });
+
+  if (houveAtualizacao) {
+    salvarLembretesNoLocalStorage();
+  }
+}
+
+// Retorna apenas os lembretes que devem aparecer no checklist de agora.
+function obterLembretesAtivos() {
+  atualizarLembretesAgendados();
+
+  return lembretes.filter(function (lembrete) {
+    return lembreteEstaAtivo(lembrete);
+  });
+}
+
+// Retorna os lembretes pausados para o próximo dia às 05:00.
+function obterLembretesAgendados() {
+  atualizarLembretesAgendados();
+
+  return lembretes.filter(function (lembrete) {
+    return lembrete.pausadoAte && !lembreteEstaAtivo(lembrete);
+  });
+}
+
 // Atualiza a plaquinha flutuante dos lembretes.
-// Regra simples: se existir lembrete no array, mostra; se não existir, esconde.
+// Regra: só aparece se existir lembrete ativo.
+// Lembrete agendado/pausado não ativa a plaquinha.
 function atualizarPlaquinhaLembrete() {
   if (!atalhoLembreteAtivo) {
     return;
   }
 
-  if (lembretes.length > 0) {
-    atalhoLembreteAtivo.classList.remove("hidden");
-  } else {
-    atalhoLembreteAtivo.classList.add("hidden");
-  }
+  const existemLembretesAtivos = obterLembretesAtivos().length > 0;
+
+  atalhoLembreteAtivo.classList.toggle("hidden", !existemLembretesAtivos);
+  atalhoLembreteAtivo.setAttribute("aria-hidden", String(!existemLembretesAtivos));
 }
 
 // Rola a tela até o checklist de lembretes.
@@ -659,19 +849,14 @@ function rolarAteLembretes() {
     block: "center",
   });
 
-  // Destaque rápido para o usuário entender onde a tela parou.
   cardLembretes.classList.add("remember-card-focus");
 
   setTimeout(function () {
     cardLembretes.classList.remove("remember-card-focus");
   }, 1200);
-
-  if (inputTextoLembrete) {
-    inputTextoLembrete.focus({ preventScroll: true });
-  }
 }
 
-// Cria o HTML exibido quando não existe nenhum lembrete cadastrado.
+// Cria o HTML exibido quando não existe nenhum lembrete ativo.
 function criarMensagemVaziaDeLembretes() {
   return `
     <li class="remember-empty">
@@ -680,9 +865,18 @@ function criarMensagemVaziaDeLembretes() {
   `;
 }
 
-// Cria o HTML de um item de lembrete.
-// Agora o item possui apenas um botão de check.
-// Ao dar check, o lembrete é removido automaticamente do array.
+// Cria o HTML exibido quando não existe lembrete agendado.
+function criarMensagemVaziaDeAgendados() {
+  return `
+    <li class="remember-scheduled-empty">
+      Nenhum lembrete agendado.
+    </li>
+  `;
+}
+
+// Cria o HTML de um lembrete ativo.
+// O check conclui e remove.
+// O relógio agenda para o próximo dia às 05:00.
 function criarItemLembrete(lembrete) {
   const textoSeguro = escaparHTML(lembrete.texto);
 
@@ -690,49 +884,100 @@ function criarItemLembrete(lembrete) {
     <li class="remember-item">
       <span class="remember-item-text">${textoSeguro}</span>
 
-      <button
-        class="remember-check-button"
-        type="button"
-        data-acao="check-lembrete"
-        data-id="${lembrete.id}"
-        aria-label="Marcar lembrete como feito"
-        title="Marcar como feito"
-      >
-        ✓
-      </button>
+      <div class="remember-item-actions">
+        <button
+          class="remember-check-button"
+          type="button"
+          data-acao="check-lembrete"
+          data-id="${lembrete.id}"
+          aria-label="Marcar lembrete como feito"
+          title="Marcar como feito"
+        >
+          ✓
+        </button>
+
+        <button
+          class="remember-clock-button"
+          type="button"
+          data-acao="adiar-lembrete"
+          data-id="${lembrete.id}"
+          aria-label="Agendar lembrete para amanhã às 05:00"
+          title="Agendar para amanhã às 05:00"
+        >
+          ⏰
+        </button>
+      </div>
     </li>
   `;
 }
 
-// Renderiza todos os lembretes na tela.
-// Renderizar é redesenhar a interface com base no array atual.
-function renderizarLembretes() {
-  if (!listaLembretes) {
-    atualizarPlaquinhaLembrete();
+// Cria o HTML de um lembrete agendado.
+// Ele aparece embaixo do checklist, sem ativar a plaquinha.
+function criarItemLembreteAgendado(lembrete) {
+  const textoSeguro = escaparHTML(lembrete.texto);
+  const horarioSeguro = escaparHTML(formatarHorarioAgendado(lembrete.pausadoAte));
+
+  return `
+    <li class="remember-scheduled-item">
+      <span>${textoSeguro}</span>
+      <small>Volta em ${horarioSeguro}</small>
+    </li>
+  `;
+}
+
+// Renderiza a lista de lembretes agendados.
+function renderizarLembretesAgendados() {
+  if (!listaLembretesAgendados) {
     return;
   }
 
-  if (lembretes.length === 0) {
+  const lembretesAgendados = obterLembretesAgendados();
+
+  if (contadorLembretesAgendados) {
+    contadorLembretesAgendados.textContent = lembretesAgendados.length;
+  }
+
+  if (lembretesAgendados.length === 0) {
+    listaLembretesAgendados.innerHTML = criarMensagemVaziaDeAgendados();
+    return;
+  }
+
+  listaLembretesAgendados.innerHTML = lembretesAgendados
+    .map(function (lembrete) {
+      return criarItemLembreteAgendado(lembrete);
+    })
+    .join("");
+}
+
+// Renderiza todos os lembretes na tela.
+function renderizarLembretes() {
+  if (!listaLembretes) {
+    atualizarPlaquinhaLembrete();
+    renderizarLembretesAgendados();
+    return;
+  }
+
+  const lembretesAtivos = obterLembretesAtivos();
+
+  if (lembretesAtivos.length === 0) {
     listaLembretes.innerHTML = criarMensagemVaziaDeLembretes();
 
     if (mensagemLembrete) {
       mensagemLembrete.textContent = "Nenhum lembrete ativo.";
     }
+  } else {
+    listaLembretes.innerHTML = lembretesAtivos
+      .map(function (lembrete) {
+        return criarItemLembrete(lembrete);
+      })
+      .join("");
 
-    atualizarPlaquinhaLembrete();
-    return;
+    if (mensagemLembrete) {
+      mensagemLembrete.textContent = `${lembretesAtivos.length} lembrete(s) ativo(s).`;
+    }
   }
 
-  listaLembretes.innerHTML = "";
-
-  lembretes.forEach(function (lembrete) {
-    listaLembretes.innerHTML += criarItemLembrete(lembrete);
-  });
-
-  if (mensagemLembrete) {
-    mensagemLembrete.textContent = `${lembretes.length} lembrete(s) ativo(s).`;
-  }
-
+  renderizarLembretesAgendados();
   atualizarPlaquinhaLembrete();
 }
 
@@ -742,6 +987,7 @@ function criarLembretePeloFormulario() {
     id: Date.now(),
     texto: inputTextoLembrete.value.trim(),
     criadoEm: new Date().toISOString(),
+    pausadoAte: null,
   };
 }
 
@@ -754,7 +1000,6 @@ function adicionarLembrete() {
   salvarLembretesNoLocalStorage();
   renderizarLembretes();
 
-  // Depois de adicionar, limpamos o campo para ficar rápido cadastrar outro.
   if (formularioLembrete) {
     formularioLembrete.reset();
   }
@@ -767,8 +1012,7 @@ function adicionarLembrete() {
 }
 
 // Marca o lembrete como feito.
-// Em vez de manter botão de excluir, o check já remove o lembrete da lista.
-// Isso deixa o uso mais rápido: escreveu, apareceu, fez, marcou, sumiu.
+// O check remove da lista e também desativa a plaquinha caso não exista outro ativo.
 function marcarCheckLembrete(idLembrete) {
   lembretes = lembretes.filter(function (lembrete) {
     return lembrete.id !== idLembrete;
@@ -778,10 +1022,352 @@ function marcarCheckLembrete(idLembrete) {
   renderizarLembretes();
 
   if (mensagemLembrete) {
-    mensagemLembrete.textContent = "Check feito. Lembrete removido da lista.";
+    mensagemLembrete.textContent = "Check feito. Lembrete removido.";
   }
 
   console.log("Lembrete marcado como feito. Array atual:", lembretes);
+}
+
+// Agenda o lembrete para amanhã às 05:00.
+// Ele sai do checklist ativo e aparece em "Agendados".
+function adiarLembreteParaAmanha(idLembrete) {
+  lembretes = lembretes.map(function (lembrete) {
+    if (lembrete.id === idLembrete) {
+      return {
+        ...lembrete,
+        pausadoAte: calcularProximoDiaAsCinco(),
+      };
+    }
+
+    return lembrete;
+  });
+
+  salvarLembretesNoLocalStorage();
+  renderizarLembretes();
+
+  if (mensagemLembrete) {
+    mensagemLembrete.textContent = "Lembrete agendado para amanhã às 05:00.";
+  }
+
+  console.log("Lembrete agendado para amanhã às 05:00. Array atual:", lembretes);
+}
+
+
+
+// Inicializa o mini-paint com canvas.
+// Ele usa Pointer Events, então funciona com mouse, caneta touch e toque no celular.
+function inicializarMiniPaint() {
+  const canvasPaint = document.getElementById("paintCanvas");
+  const botaoLimparPaint = document.getElementById("botaoLimparPaint");
+  const botaoSalvarPrintPaint = document.getElementById("botaoSalvarPrintPaint");
+  const mensagemPaint = document.getElementById("mensagemPaint");
+  const galeriaPrintsPaint = document.getElementById("galeriaPrintsPaint");
+  const contadorPrintsPaint = document.getElementById("contadorPrintsPaint");
+  const paintModal = document.getElementById("paintModal");
+  const imagemPaintModal = document.getElementById("imagemPaintModal");
+  const botaoFecharPaintModal = document.getElementById("botaoFecharPaintModal");
+
+  if (!canvasPaint) {
+    return;
+  }
+
+  const contextoPaint = canvasPaint.getContext("2d");
+  let desenhando = false;
+  let resizeTimer = null;
+
+  // Busca a lista de prints salvos.
+  function carregarPrintsDoPaint() {
+    const printsSalvos = localStorage.getItem(PAINT_PRINTS_STORAGE_KEY);
+
+    if (!printsSalvos) {
+      return [];
+    }
+
+    try {
+      return JSON.parse(printsSalvos);
+    } catch (erro) {
+      console.error("Erro ao carregar prints do mini-paint:", erro);
+      localStorage.removeItem(PAINT_PRINTS_STORAGE_KEY);
+      return [];
+    }
+  }
+
+  // Salva a lista de prints no localStorage.
+  function salvarPrintsDoPaint(prints) {
+    localStorage.setItem(PAINT_PRINTS_STORAGE_KEY, JSON.stringify(prints));
+  }
+
+  // Renderiza até 3 miniaturas salvas embaixo do quadro.
+  // Clicar em uma miniatura abre a imagem em tamanho maior no modal.
+  function renderizarPrintsDoPaint() {
+    if (!galeriaPrintsPaint) {
+      return;
+    }
+
+    const prints = carregarPrintsDoPaint();
+
+    if (contadorPrintsPaint) {
+      contadorPrintsPaint.textContent = prints.length;
+    }
+
+    if (prints.length === 0) {
+      galeriaPrintsPaint.innerHTML =
+        '<div class="paint-gallery-empty">Nenhum print salvo ainda.</div>';
+      return;
+    }
+
+    galeriaPrintsPaint.innerHTML = prints
+      .slice(0, 3)
+      .map(function (print, indice) {
+        return `
+          <button
+            class="paint-print-card"
+            type="button"
+            data-print-id="${print.id}"
+            aria-label="Abrir print salvo ${indice + 1}"
+          >
+            <img src="${print.imagem}" alt="Print salvo do mini-paint ${indice + 1}" />
+            <small>${print.criadoEm}</small>
+          </button>
+        `;
+      })
+      .join("");
+  }
+
+  // Abre o print salvo em tamanho maior.
+  function abrirPrintDoPaint(idPrint) {
+    if (!paintModal || !imagemPaintModal) {
+      return;
+    }
+
+    const prints = carregarPrintsDoPaint();
+
+    const printEncontrado = prints.find(function (print) {
+      return String(print.id) === String(idPrint);
+    });
+
+    if (!printEncontrado) {
+      return;
+    }
+
+    imagemPaintModal.src = printEncontrado.imagem;
+    paintModal.classList.remove("hidden");
+    paintModal.setAttribute("aria-hidden", "false");
+  }
+
+  // Fecha o modal do print.
+  function fecharPrintDoPaint() {
+    if (!paintModal || !imagemPaintModal) {
+      return;
+    }
+
+    imagemPaintModal.src = "";
+    paintModal.classList.add("hidden");
+    paintModal.setAttribute("aria-hidden", "true");
+  }
+
+  // Pinta o fundo branco e configura a caneta preta.
+  function prepararQuadroBranco(largura, altura) {
+    contextoPaint.fillStyle = "#ffffff";
+    contextoPaint.fillRect(0, 0, largura, altura);
+
+    contextoPaint.strokeStyle = "#111111";
+    contextoPaint.lineWidth = 3;
+    contextoPaint.lineCap = "round";
+    contextoPaint.lineJoin = "round";
+  }
+
+  // Ajusta o canvas para ficar nítido em telas com DPR alto, como celular.
+  function ajustarTamanhoDoPaint() {
+    const retangulo = canvasPaint.getBoundingClientRect();
+    const largura = Math.max(1, retangulo.width);
+    const altura = Math.max(1, retangulo.height);
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const desenhoSalvo = localStorage.getItem(PAINT_STORAGE_KEY);
+
+    canvasPaint.width = Math.floor(largura * dpr);
+    canvasPaint.height = Math.floor(altura * dpr);
+
+    contextoPaint.setTransform(dpr, 0, 0, dpr, 0, 0);
+    prepararQuadroBranco(largura, altura);
+
+    if (!desenhoSalvo) {
+      return;
+    }
+
+    const imagem = new Image();
+
+    imagem.onload = function () {
+      contextoPaint.drawImage(imagem, 0, 0, largura, altura);
+    };
+
+    imagem.src = desenhoSalvo;
+  }
+
+  // Calcula a posição do mouse/toque dentro do canvas.
+  function obterPosicaoNoPaint(evento) {
+    const retangulo = canvasPaint.getBoundingClientRect();
+
+    return {
+      x: evento.clientX - retangulo.left,
+      y: evento.clientY - retangulo.top,
+    };
+  }
+
+  // Salva o rascunho atual para não perder se atualizar a página.
+  function salvarDesenhoDoPaint() {
+    try {
+      localStorage.setItem(PAINT_STORAGE_KEY, canvasPaint.toDataURL("image/png"));
+
+      if (mensagemPaint) {
+        mensagemPaint.textContent = "Rascunho salvo automaticamente.";
+      }
+    } catch (erro) {
+      console.error("Erro ao salvar rascunho do mini-paint:", erro);
+
+      if (mensagemPaint) {
+        mensagemPaint.textContent = "Não foi possível salvar o rascunho.";
+      }
+    }
+  }
+
+  // Salva um print do desenho atual na galeria.
+  function salvarPrintDoPaint() {
+    try {
+      const prints = carregarPrintsDoPaint();
+      const agora = new Date();
+
+      prints.unshift({
+        id: Date.now(),
+        imagem: canvasPaint.toDataURL("image/png"),
+        criadoEm: agora.toLocaleString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      });
+
+      // Mantemos no máximo 3 prints para evitar excesso de uso do localStorage.
+      salvarPrintsDoPaint(prints.slice(0, 3));
+      renderizarPrintsDoPaint();
+
+      if (mensagemPaint) {
+        mensagemPaint.textContent = "Print salvo na galeria.";
+      }
+    } catch (erro) {
+      console.error("Erro ao salvar print do mini-paint:", erro);
+
+      if (mensagemPaint) {
+        mensagemPaint.textContent = "Não foi possível salvar o print.";
+      }
+    }
+  }
+
+  // Começa o traço.
+  function iniciarDesenho(evento) {
+    evento.preventDefault();
+    desenhando = true;
+
+    const posicao = obterPosicaoNoPaint(evento);
+
+    canvasPaint.setPointerCapture(evento.pointerId);
+    contextoPaint.beginPath();
+    contextoPaint.moveTo(posicao.x, posicao.y);
+  }
+
+  // Continua o traço enquanto o usuário move o mouse ou o dedo.
+  function desenhar(evento) {
+    if (!desenhando) {
+      return;
+    }
+
+    evento.preventDefault();
+
+    const posicao = obterPosicaoNoPaint(evento);
+
+    contextoPaint.lineTo(posicao.x, posicao.y);
+    contextoPaint.stroke();
+  }
+
+  // Finaliza o traço e salva o rascunho.
+  function pararDesenho(evento) {
+    if (!desenhando) {
+      return;
+    }
+
+    desenhando = false;
+
+    try {
+      canvasPaint.releasePointerCapture(evento.pointerId);
+    } catch (erro) {
+      // Se o ponteiro já tiver sido solto pelo navegador, seguimos normalmente.
+    }
+
+    salvarDesenhoDoPaint();
+  }
+
+  // Limpa apenas o quadro atual.
+  // Os prints já salvos continuam na galeria.
+  function limparPaint() {
+    const retangulo = canvasPaint.getBoundingClientRect();
+
+    prepararQuadroBranco(retangulo.width, retangulo.height);
+    localStorage.removeItem(PAINT_STORAGE_KEY);
+
+    if (mensagemPaint) {
+      mensagemPaint.textContent = "Quadro limpo. Prints salvos continuam abaixo.";
+    }
+  }
+
+  canvasPaint.addEventListener("pointerdown", iniciarDesenho);
+  canvasPaint.addEventListener("pointermove", desenhar);
+  canvasPaint.addEventListener("pointerup", pararDesenho);
+  canvasPaint.addEventListener("pointercancel", pararDesenho);
+  canvasPaint.addEventListener("pointerleave", pararDesenho);
+
+  if (botaoLimparPaint) {
+    botaoLimparPaint.addEventListener("click", limparPaint);
+  }
+
+  if (botaoSalvarPrintPaint) {
+    botaoSalvarPrintPaint.addEventListener("click", salvarPrintDoPaint);
+  }
+
+  if (galeriaPrintsPaint) {
+    galeriaPrintsPaint.addEventListener("click", function (evento) {
+      const cardPrint = evento.target.closest("[data-print-id]");
+
+      if (!cardPrint) {
+        return;
+      }
+
+      abrirPrintDoPaint(cardPrint.dataset.printId);
+    });
+  }
+
+  if (botaoFecharPaintModal) {
+    botaoFecharPaintModal.addEventListener("click", fecharPrintDoPaint);
+  }
+
+  if (paintModal) {
+    paintModal.addEventListener("click", function (evento) {
+      if (evento.target === paintModal) {
+        fecharPrintDoPaint();
+      }
+    });
+  }
+
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+
+    resizeTimer = setTimeout(function () {
+      ajustarTamanhoDoPaint();
+    }, 250);
+  });
+
+  ajustarTamanhoDoPaint();
+  renderizarPrintsDoPaint();
 }
 
 // Evento de cadastro/edição do formulário.
@@ -840,6 +1426,8 @@ if (formularioLembrete) {
   });
 }
 
+
+
 // Captura cliques nos botões criados dinamicamente.
 document.addEventListener("click", function (evento) {
   const botaoClicado = evento.target.closest("button");
@@ -871,10 +1459,16 @@ document.addEventListener("click", function (evento) {
     return;
   }
 
+
   const idRegistro = Number(botaoClicado.dataset.id);
 
   if (acao === "check-lembrete") {
     marcarCheckLembrete(idRegistro);
+    return;
+  }
+
+  if (acao === "adiar-lembrete") {
+    adiarLembreteParaAmanha(idRegistro);
     return;
   }
 
@@ -910,6 +1504,15 @@ botoesFiltro.forEach(function (botao) {
 
 // Marca o dia atual assim que a página carrega.
 marcarDiaAtualNaSemana();
+
+// Centraliza o dia atual nos carrosséis depois que a tela termina de montar.
+// Usamos setTimeout curto porque o navegador precisa calcular larguras antes de rolar.
+setTimeout(function () {
+  centralizarDiaAtualNosCarrosseis("auto");
+}, 120);
+
+// Liga o mini-paint.
+inicializarMiniPaint();
 
 // Renderiza o estado inicial da tela.
 renderizarRegistros();
