@@ -97,57 +97,106 @@
         </article>
       </section>
 
-      <!-- Legenda de importância -->
-      <section class="legend-card" aria-label="Legenda de importância">
-        <div class="legend-item">
-          <span class="dot urgent"></span>
-          <strong>Urgente</strong>
+      <!-- Filtros dos registros
+        Agora os próprios filtros também funcionam como legenda visual.
+        Assim evitamos repetir Urgente/Média/Baixa em dois lugares diferentes.
+      -->
+      <section class="filter-panel" aria-label="Filtros de registros">
+        <div class="filter-info">
+          <span>Filtros rápidos</span>
+          <p>Escolha uma visão por status ou importância.</p>
         </div>
 
-        <div class="legend-item">
-          <span class="dot medium"></span>
-          <strong>Média</strong>
-        </div>
+        <div class="filter-actions">
+          <button class="filter-button active" type="button" data-filtro="todos">
+            <span class="filter-dot all"></span>
+            Todos
+          </button>
 
-        <div class="legend-item">
-          <span class="dot low"></span>
-          <strong>Baixa</strong>
+          <button class="filter-button" type="button" data-filtro="pendentes">
+            <span class="filter-dot pending"></span>
+            Pendentes
+          </button>
+
+          <button class="filter-button" type="button" data-filtro="concluidos">
+            <span class="filter-dot done"></span>
+            Concluídos
+          </button>
+
+          <button class="filter-button" type="button" data-filtro="urgentes">
+            <span class="filter-dot urgent"></span>
+            Urgentes
+          </button>
+
+          <button class="filter-button" type="button" data-filtro="media">
+            <span class="filter-dot medium"></span>
+            Média
+          </button>
+
+          <button class="filter-button" type="button" data-filtro="baixa">
+            <span class="filter-dot low"></span>
+            Baixa
+          </button>
         </div>
       </section>
 
-      <!-- Filtros dos registros -->
-      <section class="filter-panel" aria-label="Filtros de registros">
-        <button class="filter-button active" type="button" data-filtro="todos">
-          Todos
-        </button>
+      <!-- Navegação semanal para celular
+        No desktop ela fica escondida pelo CSS.
+        No celular, funciona como um mini calendário: toca no dia e a página rola até ele.
+      -->
+      <section class="mobile-week-nav" aria-label="Navegação rápida pelos dias da semana">
+        <div class="mobile-week-nav-title">
+          <span>Semana</span>
+          <p>Toque em um dia para centralizar a semana.</p>
+        </div>
 
-        <button class="filter-button" type="button" data-filtro="pendentes">
-          Pendentes
-        </button>
+        <div class="mobile-day-tabs">
+          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="segunda">
+            <span>Seg</span>
+            <strong>Segunda</strong>
+          </button>
 
-        <button class="filter-button" type="button" data-filtro="concluidos">
-          Concluídos
-        </button>
+          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="terca">
+            <span>Ter</span>
+            <strong>Terça</strong>
+          </button>
 
-        <button class="filter-button" type="button" data-filtro="urgentes">
-          Urgentes
-        </button>
+          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="quarta">
+            <span>Qua</span>
+            <strong>Quarta</strong>
+          </button>
 
-        <button class="filter-button" type="button" data-filtro="media">
-          Média
-        </button>
+          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="quinta">
+            <span>Qui</span>
+            <strong>Quinta</strong>
+          </button>
 
-        <button class="filter-button" type="button" data-filtro="baixa">
-          Baixa
-        </button>
+          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="sexta">
+            <span>Sex</span>
+            <strong>Sexta</strong>
+          </button>
+
+          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="sabado">
+            <span>Sáb</span>
+            <strong>Sábado</strong>
+          </button>
+
+          <button class="mobile-day-button" type="button" data-acao="ir-dia" data-dia-alvo="domingo">
+            <span>Dom</span>
+            <strong>Domingo</strong>
+          </button>
+        </div>
       </section>
 
       <!-- Layout principal da semana -->
       <section id="semana" class="planner-layout">
-        <!-- Quadro principal com os dias úteis -->
+        <!-- Quadro principal com todos os dias da semana.
+          No desktop ele aparece como painel semanal.
+          No celular, o CSS transforma esta área em um carrossel horizontal.
+        -->
         <div class="week-board">
-          <div class="week-grid">
-            <article class="day-column">
+          <div class="week-grid" aria-label="Carrossel semanal de registros">
+            <article id="dia-segunda" class="day-column scroll-target" data-dia-coluna="segunda">
               <header>
                 <div>
                   <span class="day-dot low"></span>
@@ -158,7 +207,7 @@
               <div class="task-list" data-lista-dia="segunda"></div>
             </article>
 
-            <article class="day-column">
+            <article id="dia-terca" class="day-column scroll-target" data-dia-coluna="terca">
               <header>
                 <div>
                   <span class="day-dot low"></span>
@@ -169,7 +218,7 @@
               <div class="task-list" data-lista-dia="terca"></div>
             </article>
 
-            <article class="day-column">
+            <article id="dia-quarta" class="day-column scroll-target" data-dia-coluna="quarta">
               <header>
                 <div>
                   <span class="day-dot low"></span>
@@ -180,7 +229,7 @@
               <div class="task-list" data-lista-dia="quarta"></div>
             </article>
 
-            <article class="day-column">
+            <article id="dia-quinta" class="day-column scroll-target" data-dia-coluna="quinta">
               <header>
                 <div>
                   <span class="day-dot low"></span>
@@ -191,7 +240,7 @@
               <div class="task-list" data-lista-dia="quinta"></div>
             </article>
 
-            <article class="day-column">
+            <article id="dia-sexta" class="day-column scroll-target" data-dia-coluna="sexta">
               <header>
                 <div>
                   <span class="day-dot low"></span>
@@ -201,27 +250,39 @@
 
               <div class="task-list" data-lista-dia="sexta"></div>
             </article>
+
+            <article id="dia-sabado" class="day-column day-column-weekend scroll-target" data-dia-coluna="sabado">
+              <header>
+                <div>
+                  <span class="day-dot rest"></span>
+                  <h3>Sábado</h3>
+                </div>
+
+                <span class="weekend-label">Descanso</span>
+              </header>
+
+              <div class="task-list" data-lista-dia="sabado"></div>
+            </article>
+
+            <article id="dia-domingo" class="day-column day-column-weekend scroll-target" data-dia-coluna="domingo">
+              <header>
+                <div>
+                  <span class="day-dot rest"></span>
+                  <h3>Domingo</h3>
+                </div>
+
+                <span class="weekend-label">Planejamento</span>
+              </header>
+
+              <div class="task-list" data-lista-dia="domingo"></div>
+            </article>
           </div>
         </div>
 
-        <!-- Coluna lateral com fim de semana e tarefas rápidas -->
+        <!-- Lista rápida fica fora do carrossel semanal.
+          Assim o celular fica mais limpo e a semana concentra os 7 dias.
+        -->
         <aside class="side-panel">
-          <section class="weekend-card">
-            <span class="side-kicker">Fim de semana</span>
-            <h3>Sábado</h3>
-            <p>Espaço para simulados, revisões ou tarefas extras.</p>
-
-            <div class="task-list" data-lista-dia="sabado"></div>
-          </section>
-
-          <section class="weekend-card">
-            <span class="side-kicker">Planejamento</span>
-            <h3>Domingo</h3>
-            <p>Revise a semana e organize os próximos estudos.</p>
-
-            <div class="task-list" data-lista-dia="domingo"></div>
-          </section>
-
           <section class="todo-card">
             <span class="side-kicker">Lista rápida</span>
             <h3>Fazer agora ou depois</h3>
@@ -314,7 +375,7 @@
             </label>
 
             <div class="form-actions">
-              <button id="botaoSubmit" type="submit">Adicionar registro</button>
+              <button id="botaoSubmit" type="submit">➕ Adicionar registro</button>
 
               <button id="botaoLimpar" type="reset">Limpar</button>
 
