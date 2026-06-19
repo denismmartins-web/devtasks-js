@@ -2449,3 +2449,1169 @@ textarea {
     height: 36px;
   }
 }
+
+
+/* =========================================================
+   Branch: feature/anotacoes-rapidas
+   Ajustes de calendário, anotações rápidas e mini-paint
+   ========================================================= */
+
+/* Com três informações de calendário, o painel fica equilibrado no desktop. */
+.date-panel {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* O dia atual ganha destaque por ser a informação mais imediata do calendário. */
+.date-panel article:nth-child(2) {
+  border-color: rgba(92, 200, 255, 0.42);
+  background: linear-gradient(145deg, rgba(92, 200, 255, 0.14), rgba(16, 22, 42, 0.86));
+}
+
+/* Plaquinha discreta de lembrete ativo. */
+.reminder-float {
+  position: fixed;
+  top: 92px;
+  right: 22px;
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 209, 102, 0.72);
+  border-radius: 16px;
+  color: #111827;
+  background: linear-gradient(135deg, #ffd166, #ffed9a);
+  box-shadow: 0 12px 32px rgba(255, 209, 102, 0.24), 0 0 0 1px rgba(255, 255, 255, 0.16) inset;
+  font-size: 1.15rem;
+  cursor: pointer;
+  animation: reminderFloat 2.4s ease-in-out infinite;
+}
+
+.reminder-float:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(255, 209, 102, 0.32), 0 0 22px rgba(255, 209, 102, 0.2);
+}
+
+@keyframes reminderFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Anotações rápidas: agora é um campo real, salvo pelo JavaScript. */
+.quick-note-label {
+  display: block;
+  margin: 12px 0 8px;
+  color: var(--muted-strong);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.quick-note-textarea {
+  min-height: 220px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.065)),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgba(180, 198, 255, 0.22) 32px
+    );
+  line-height: 32px;
+}
+
+.note-message,
+.remember-message,
+.paint-message {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+/* Lembretes rápidos com botão + simples. */
+.remember-form {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.remember-form label {
+  color: var(--muted-strong);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.remember-input-row {
+  display: grid;
+  grid-template-columns: 1fr 46px;
+  gap: 8px;
+}
+
+.remember-input-row button,
+.remember-check-button {
+  border: 1px solid rgba(92, 200, 255, 0.62);
+  border-radius: 999px;
+  color: #050713;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent));
+  font-size: 1.2rem;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.remember-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  list-style: none;
+}
+
+.remember-item,
+.remember-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.remember-empty {
+  justify-content: center;
+  color: var(--muted);
+  border-style: dashed;
+}
+
+.remember-item-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.remember-check-button {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+}
+
+.remember-card-focus {
+  border-color: rgba(255, 209, 102, 0.72);
+  box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.12), var(--shadow-card);
+}
+
+/* Mini-paint ocupa uma linha inteira para o quadro ter espaço de desenho. */
+.paint-card {
+  grid-column: 1 / -1;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(16, 22, 42, 0.86));
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+}
+
+.paint-card h3 {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.paint-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.paint-board-wrap {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px solid rgba(180, 198, 255, 0.28);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.paint-canvas {
+  width: 100%;
+  height: 320px;
+  display: block;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.12);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.paint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.paint-actions button {
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.07);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.paint-actions button:hover {
+  border-color: var(--accent-blue);
+  color: var(--text);
+  background: rgba(124, 140, 255, 0.16);
+}
+
+@media (max-width: 1020px) {
+  .date-panel {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .reminder-float {
+    top: 84px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    font-size: 1rem;
+  }
+
+  .date-panel {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .date-panel article {
+    min-height: 72px;
+    padding: 10px;
+  }
+
+  .date-panel span {
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+  }
+
+  .date-panel strong {
+    font-size: 1.18rem;
+  }
+
+  .quick-note-textarea {
+    min-height: 180px;
+  }
+
+  .paint-card {
+    padding: 16px;
+  }
+
+  .paint-board-wrap {
+    padding: 8px;
+  }
+
+  .paint-canvas {
+    height: 260px;
+  }
+}
+
+
+/* =========================================================
+   Correção: card Dia visível no calendário
+   ========================================================= */
+
+/* Mantém o calendário como Mês | Dia | Ano, inclusive se regras antigas aparecerem antes. */
+.date-panel {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Classe específica do card Dia para deixar claro visualmente que ele existe. */
+.date-day-card {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(92, 200, 255, 0.5);
+  background: linear-gradient(145deg, rgba(92, 200, 255, 0.18), rgba(124, 140, 255, 0.08));
+}
+
+/* Detalhe luminoso no card Dia. */
+.date-day-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent));
+}
+
+/* Valor numérico do dia fica um pouco mais destacado. */
+#diaAtualCalendario {
+  color: var(--text);
+  text-shadow: 0 0 18px rgba(92, 200, 255, 0.35);
+}
+
+@media (max-width: 640px) {
+  .date-panel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .date-panel article {
+    min-height: 66px;
+  }
+}
+
+
+/* =========================================================
+   Ajuste: carrosséis priorizam o dia atual
+   Branch: feature/anotacoes-rapidas
+   ========================================================= */
+
+/* O carrossel semanal e o carrossel das anotações ficam com margem de respiro,
+   para o item centralizado não colar nas bordas do celular. */
+.mobile-day-tabs,
+.note-day-tabs,
+.week-grid {
+  scroll-behavior: smooth;
+}
+
+/* Cabeçalho da anotação do dia. */
+.notes-current-day {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 10px;
+  padding: 12px;
+  border: 1px solid rgba(92, 200, 255, 0.34);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(145deg, rgba(92, 200, 255, 0.12), rgba(255, 255, 255, 0.045));
+}
+
+.notes-current-day span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.notes-current-day strong {
+  color: var(--accent-blue);
+  font-size: 1.12rem;
+}
+
+/* Carrossel dos dias das anotações. */
+.note-day-tabs {
+  display: flex;
+  gap: 9px;
+  margin: 10px 0 12px;
+  padding: 4px 4px 9px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 42%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.note-day-button {
+  min-width: 82px;
+  padding: 9px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.065);
+  cursor: pointer;
+  scroll-snap-align: center;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.note-day-button span,
+.note-day-button strong {
+  display: block;
+}
+
+.note-day-button span {
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
+.note-day-button strong {
+  margin-top: 2px;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.note-day-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+  color: var(--text);
+  background: rgba(124, 140, 255, 0.14);
+}
+
+.note-day-button.note-day-today {
+  border-color: rgba(255, 209, 102, 0.72);
+  background: linear-gradient(145deg, rgba(255, 209, 102, 0.22), rgba(255, 255, 255, 0.065));
+}
+
+.note-day-button.note-day-selected {
+  color: #050713;
+  border-color: var(--accent-blue);
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent));
+  box-shadow: 0 0 24px rgba(92, 200, 255, 0.22);
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* No celular, a semana e as anotações reforçam a ideia de "dia atual no centro". */
+@media (max-width: 640px) {
+  .mobile-day-tabs,
+  .note-day-tabs {
+    scroll-padding-inline: 42%;
+  }
+
+  .mobile-week-nav-title p {
+    font-size: 0.68rem;
+  }
+
+  .note-day-tabs {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .note-day-button {
+    min-width: 72px;
+    padding: 8px 9px;
+    border-radius: 16px;
+  }
+
+  .note-day-button span {
+    font-size: 0.72rem;
+  }
+
+  .note-day-button strong {
+    font-size: 0.6rem;
+  }
+
+  .notes-current-day {
+    padding: 10px;
+    border-radius: 15px;
+  }
+
+  .notes-current-day strong {
+    font-size: 1rem;
+  }
+
+  .quick-note-textarea {
+    min-height: 165px;
+  }
+}
+
+
+/* =========================================================
+   Correção visual: o carrossel principal é o box da semana
+   Branch: feature/anotacoes-rapidas
+   ========================================================= */
+
+/* O mini calendário separado foi removido do HTML. */
+.mobile-week-nav,
+.note-day-tabs,
+.notes-current-day,
+.quick-note-label,
+.quick-note-textarea,
+.note-message {
+  display: none !important;
+}
+
+/* O quadro da semana é o carrossel real no mobile. */
+@media (max-width: 640px) {
+  .week-board {
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .week-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 12px;
+    min-height: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 12%;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 12% 10px;
+    border: none;
+    background: transparent;
+  }
+
+  .day-column {
+    min-width: 76%;
+    flex: 0 0 76%;
+    min-height: 460px;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    overflow: hidden;
+    scroll-snap-align: center;
+    box-shadow: var(--shadow-card);
+  }
+
+  .day-column.dia-atual {
+    transform: scale(1.02);
+    border-color: rgba(92, 200, 255, 0.88);
+    box-shadow:
+      0 0 0 1px rgba(92, 200, 255, 0.2),
+      0 0 32px rgba(92, 200, 255, 0.22),
+      var(--shadow-card);
+  }
+
+  .day-column header {
+    min-height: 64px;
+  }
+
+  .day-column h3 {
+    font-size: 0.95rem;
+  }
+
+  .task-list {
+    min-height: 340px;
+  }
+}
+
+/* No desktop, mantemos o quadro como dashboard de 7 colunas. */
+@media (min-width: 641px) {
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    overflow: hidden;
+  }
+}
+
+/* Anotações rápidas agora são o mini-paint. */
+.paint-notes-card {
+  grid-column: 1 / -1;
+}
+
+.paint-notes-card p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* Ações do mini-paint em formato simples: câmera e X. */
+.paint-actions {
+  align-items: center;
+}
+
+.paint-action-button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 15px;
+  font-size: 1.1rem;
+}
+
+.paint-save-button {
+  color: #050713 !important;
+  border-color: var(--accent-blue) !important;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent)) !important;
+}
+
+.paint-clear-button {
+  color: var(--text) !important;
+  border-color: rgba(255, 77, 109, 0.48) !important;
+  background: rgba(255, 77, 109, 0.14) !important;
+}
+
+/* Área dos prints salvos. */
+.paint-gallery-area {
+  margin-top: 16px;
+}
+
+.paint-gallery-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.paint-gallery-title span {
+  color: var(--accent-blue);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+}
+
+.paint-gallery-title strong {
+  min-width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #050713;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent));
+  font-size: 0.82rem;
+}
+
+.paint-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.paint-gallery-empty {
+  padding: 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.paint-print-card {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.paint-print-card img {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.paint-print-card small {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .paint-notes-card {
+    padding: 16px;
+  }
+
+  .paint-canvas {
+    height: 245px;
+  }
+
+  .paint-gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+   Correção: checklist rápido e simetria do carrossel
+   Branch: feature/anotacoes-rapidas
+   ========================================================= */
+
+/* Plaquinha flutuante pequena: não estica e não ocupa o cabeçalho. */
+.reminder-float {
+  position: fixed;
+  top: 92px;
+  right: 18px;
+  z-index: 40;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 209, 102, 0.8);
+  border-radius: 14px 14px 14px 4px;
+  color: #050713;
+  background: linear-gradient(135deg, #ffd166, #ffea99);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(255, 209, 102, 0.18),
+    0 12px 32px rgba(0, 0, 0, 0.34),
+    0 0 26px rgba(255, 209, 102, 0.26);
+  animation: reminderFloatPulse 2.2s ease-in-out infinite;
+}
+
+/* Garante que hidden vença o display grid da plaquinha. */
+.reminder-float.hidden,
+.hidden {
+  display: none !important;
+}
+
+.reminder-float:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes reminderFloatPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: translateY(-4px);
+    filter: brightness(1.08);
+  }
+}
+
+/* No mobile, a plaquinha fica ainda mais discreta no canto direito. */
+@media (max-width: 640px) {
+  .reminder-float {
+    top: 82px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 13px 13px 13px 4px;
+    font-size: 1.05rem;
+  }
+}
+
+/* O item de lembrete volta a ser compacto e com ações alinhadas. */
+.remember-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Texto não força o card a esticar lateralmente. */
+.remember-item-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Área de ações compacta: check e relógio lado a lado. */
+.remember-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+/* Botões pequenos e quadrados, evitando esticar o card. */
+.remember-item-actions button,
+.remember-check-button,
+.remember-clock-button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  padding: 0;
+  border-radius: 12px;
+  font-size: 0.98rem;
+}
+
+.remember-check-button {
+  color: #050713;
+  border-color: rgba(56, 217, 150, 0.72);
+  background: linear-gradient(135deg, var(--low), #9effcf);
+}
+
+.remember-clock-button {
+  color: #050713;
+  border-color: rgba(255, 209, 102, 0.72);
+  background: linear-gradient(135deg, var(--medium), #ffea99);
+}
+
+/* Sábado e domingo ficam simétricos com os outros dias.
+   A linha superior/área do header usa o mesmo tamanho, só com cor diferente. */
+.day-column-weekend header {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(168, 85, 247, 0.12), rgba(255, 255, 255, 0.045));
+}
+
+/* Também padronizamos os cabeçalhos dos dias comuns para a mesma altura. */
+.day-column header {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* A etiqueta de descanso/planejamento fica lateral e não aumenta a altura do header. */
+.weekend-label {
+  margin-top: 0;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .remember-item {
+    grid-template-columns: 1fr auto;
+  }
+
+  .day-column header,
+  .day-column-weekend header {
+    min-height: 62px;
+  }
+
+  .weekend-label {
+    font-size: 0.58rem;
+    padding: 3px 7px;
+  }
+}
+
+
+/* =========================================================
+   Fechamento da branch: layout desktop/mobile, agendados e mini-paint
+   ========================================================= */
+
+/* Calendário mais compacto e proporcional. */
+#painelDataCalendario.date-panel,
+.date-panel {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.date-panel article {
+  min-height: 78px;
+  padding: 13px 14px;
+}
+
+.date-panel span {
+  font-size: 0.66rem;
+  letter-spacing: 1px;
+}
+
+.date-panel strong {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--accent-blue);
+  font-size: clamp(1.02rem, 1.35vw, 1.32rem);
+  line-height: 1.1;
+}
+
+/* Desktop: semana volta a ser painel fixo, sem comportamento de carrossel. */
+@media (min-width: 901px) {
+  .week-board {
+    overflow: visible;
+  }
+
+  .week-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 0;
+    min-height: 410px;
+    padding: 0 !important;
+    overflow: hidden !important;
+    scroll-snap-type: none !important;
+  }
+
+  .day-column {
+    min-width: 0 !important;
+    flex: initial !important;
+    min-height: 410px;
+    border-right: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: 0;
+    transform: none !important;
+  }
+
+  .day-column:last-child {
+    border-right: none;
+  }
+
+  .day-column.dia-atual {
+    transform: none !important;
+  }
+}
+
+/* Mobile: o próprio box da semana é o carrossel horizontal. */
+@media (max-width: 900px) {
+  .week-board {
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .week-grid {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 12px;
+    min-height: auto;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 12%;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 12% 12px !important;
+    border: none;
+    background: transparent;
+  }
+
+  .day-column {
+    min-width: 76%;
+    flex: 0 0 76%;
+    min-height: 460px;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    overflow: hidden;
+    scroll-snap-align: center;
+    box-shadow: var(--shadow-card);
+  }
+
+  .day-column.dia-atual {
+    transform: scale(1.015);
+  }
+}
+
+/* Cabeçalhos dos dias simétricos, incluindo sábado e domingo. */
+.day-column header,
+.day-column-weekend header {
+  min-height: 60px;
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.weekend-label {
+  margin: 0;
+  padding: 3px 6px;
+  font-size: 0.54rem;
+  letter-spacing: 0.55px;
+  white-space: nowrap;
+}
+
+.day-column-weekend header {
+  background:
+    linear-gradient(90deg, rgba(168, 85, 247, 0.10), rgba(255, 255, 255, 0.045));
+}
+
+/* Desktop: formulário maior, checklist e mini-paint ao lado. */
+@media (min-width: 1021px) {
+  .bottom-layout {
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.85fr) minmax(280px, 0.9fr) !important;
+    align-items: start;
+  }
+
+  .paint-notes-card {
+    grid-column: auto !important;
+  }
+
+  .remember-card,
+  .paint-notes-card {
+    min-height: 100%;
+  }
+
+  .paint-canvas {
+    height: 210px;
+  }
+
+  .paint-gallery {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Mobile: tudo empilhado, com proporções de app. */
+@media (max-width: 1020px) {
+  .bottom-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .paint-notes-card {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* Checklist: área de agendados abaixo dos ativos. */
+.remember-scheduled-area {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(180, 198, 255, 0.14);
+}
+
+.remember-scheduled-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.remember-scheduled-title span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.remember-scheduled-title strong {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #050713;
+  background: linear-gradient(135deg, var(--medium), #ffea99);
+  font-size: 0.72rem;
+}
+
+.remember-scheduled-list {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+}
+
+.remember-scheduled-item,
+.remember-scheduled-empty {
+  padding: 9px;
+  border: 1px dashed rgba(255, 209, 102, 0.34);
+  border-radius: 13px;
+  background: rgba(255, 209, 102, 0.07);
+}
+
+.remember-scheduled-item span,
+.remember-scheduled-item small {
+  display: block;
+}
+
+.remember-scheduled-item span {
+  color: var(--muted-strong);
+  font-size: 0.82rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.remember-scheduled-item small,
+.remember-scheduled-empty {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+/* Galeria do mini-paint: no máximo 3 miniaturas visíveis. */
+.paint-gallery {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.paint-print-card {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: left;
+}
+
+.paint-print-card:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 22px rgba(92, 200, 255, 0.15);
+}
+
+.paint-print-card img {
+  aspect-ratio: 1.25 / 1;
+  object-fit: cover;
+}
+
+.paint-print-card small {
+  font-size: 0.66rem;
+}
+
+/* Modal do print salvo. */
+.paint-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5, 7, 19, 0.78);
+  backdrop-filter: blur(12px);
+}
+
+.paint-modal.hidden {
+  display: none !important;
+}
+
+.paint-modal-content {
+  position: relative;
+  width: min(920px, 96vw);
+  max-height: 90vh;
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 22px;
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.paint-modal-content img {
+  width: 100%;
+  max-height: 78vh;
+  display: block;
+  object-fit: contain;
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+.paint-modal-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 77, 109, 0.65);
+  border-radius: 999px;
+  color: var(--text);
+  background: rgba(255, 77, 109, 0.92);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+/* Mobile: miniaturas maiores e confortáveis ao toque. */
+@media (max-width: 640px) {
+  .date-panel article {
+    min-height: 62px;
+    padding: 10px 8px;
+  }
+
+  .date-panel strong {
+    font-size: 0.96rem;
+  }
+
+  .weekend-label {
+    font-size: 0.5rem;
+    padding: 3px 5px;
+  }
+
+  .paint-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px;
+  }
+
+  .paint-print-card {
+    padding: 4px;
+  }
+
+  .paint-print-card small {
+    display: none;
+  }
+}
