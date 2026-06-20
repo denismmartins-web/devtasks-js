@@ -3615,3 +3615,87 @@ textarea {
     display: none;
   }
 }
+
+
+/* =========================================================
+   Refinos finais da branch
+   - calendário centralizado
+   - desktop sem selo "Hoje"
+   - fim de semana sem etiqueta
+   - agendados com lixeira
+   ========================================================= */
+
+/* Centraliza Mês, Dia e Ano dentro dos boxes. */
+.date-panel article {
+  justify-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.date-panel span,
+.date-panel strong {
+  text-align: center;
+}
+
+/* No navegador/PC, o selo "Hoje" ocupa espaço visual.
+   Mantemos a identificação apenas pela bolinha azul aplicada pelo JavaScript. */
+@media (min-width: 901px) {
+  .today-badge {
+    display: none !important;
+  }
+}
+
+/* Remove as etiquetas do fim de semana caso ainda exista alguma cópia antiga no HTML. */
+.weekend-label {
+  display: none !important;
+}
+
+/* Como as etiquetas saíram, sábado e domingo voltam ao mesmo alinhamento dos outros dias. */
+.day-column-weekend header {
+  justify-content: flex-start;
+}
+
+/* Item agendado com texto à esquerda e lixeira à direita. */
+.remember-scheduled-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botão de lixeira do lembrete agendado. */
+.remember-scheduled-delete {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  padding: 0;
+  border: 1px solid rgba(255, 77, 109, 0.52);
+  border-radius: 11px;
+  color: var(--text);
+  background: rgba(255, 77, 109, 0.14);
+  font-size: 0.96rem;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.remember-scheduled-delete:hover {
+  transform: translateY(-2px);
+  border-color: var(--urgent);
+  background: rgba(255, 77, 109, 0.24);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.18);
+}
+
+/* Evita que o texto do agendado empurre o botão. */
+.remember-scheduled-item div {
+  min-width: 0;
+}
+
+.remember-scheduled-item span {
+  overflow-wrap: anywhere;
+}

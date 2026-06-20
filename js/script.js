@@ -919,8 +919,21 @@ function criarItemLembreteAgendado(lembrete) {
 
   return `
     <li class="remember-scheduled-item">
-      <span>${textoSeguro}</span>
-      <small>Volta em ${horarioSeguro}</small>
+      <div>
+        <span>${textoSeguro}</span>
+        <small>Volta em ${horarioSeguro}</small>
+      </div>
+
+      <button
+        class="remember-scheduled-delete"
+        type="button"
+        data-acao="excluir-lembrete-agendado"
+        data-id="${lembrete.id}"
+        aria-label="Remover lembrete agendado"
+        title="Remover lembrete agendado"
+      >
+        🗑️
+      </button>
     </li>
   `;
 }
@@ -1050,6 +1063,23 @@ function adiarLembreteParaAmanha(idLembrete) {
   }
 
   console.log("Lembrete agendado para amanhã às 05:00. Array atual:", lembretes);
+}
+
+// Remove um lembrete que estava agendado para o próximo dia.
+// Usei uma função separada para deixar claro que a lixeira remove o agendamento inteiro.
+function excluirLembreteAgendado(idLembrete) {
+  lembretes = lembretes.filter(function (lembrete) {
+    return lembrete.id !== idLembrete;
+  });
+
+  salvarLembretesNoLocalStorage();
+  renderizarLembretes();
+
+  if (mensagemLembrete) {
+    mensagemLembrete.textContent = "Lembrete agendado removido.";
+  }
+
+  console.log("Lembrete agendado removido. Array atual:", lembretes);
 }
 
 
@@ -1469,6 +1499,11 @@ document.addEventListener("click", function (evento) {
 
   if (acao === "adiar-lembrete") {
     adiarLembreteParaAmanha(idRegistro);
+    return;
+  }
+
+  if (acao === "excluir-lembrete-agendado") {
+    excluirLembreteAgendado(idRegistro);
     return;
   }
 
